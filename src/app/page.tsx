@@ -32,7 +32,7 @@ export default function HomePage() {
   return (
     <div
       className="min-h-screen flex items-center justify-center p-4"
-      style={{ backgroundColor: '#AA8AFB' }}
+      style={{ backgroundColor: '#000000' }}
     >
       <div className="max-w-sm w-full flex flex-col items-center text-center space-y-4">
         <div className="w-25 h-25 rounded-2xl overflow-hidden shadow-lg">
