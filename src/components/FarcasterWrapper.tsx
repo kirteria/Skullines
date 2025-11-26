@@ -42,7 +42,7 @@ redirectIfMiniApp()
 
 }, [router])
 
-if (!sdkready) {
+if (!sdkReady) {
 return <>{children}</>
 }
 
