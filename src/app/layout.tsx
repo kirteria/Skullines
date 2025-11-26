@@ -23,14 +23,14 @@ export const metadata: Metadata = {
   other: {
     "fc:frame": JSON.stringify({
       version: "next",
-      imageUrl: "https://skullines.vercel.app/image.png",
+      imageUrl: "https://skullines.xyz/image.png",
       button: {
         title: "Mint Skull",
         action: {
           type: "launch_frame",
           name: "Skullines",
-          url: "https://skullines.vercel.app",
-          splashImageUrl: "https://skullines.vercel.app/splash.gif",
+          url: "https://skullines.xyz",
+          splashImageUrl: "https://skullines.xyz/splash.gif",
           splashBackgroundColor: "#AA8AFB",
         },
       },
