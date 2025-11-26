@@ -91,7 +91,7 @@ export default function MintPage() {
     if (status === 'failed') return 'Mint Rejected'
     if (loading) return 'Loading'
     if (isSoldOut) return 'Minted Out'
-    if (!mintingEnabled) return 'Mint Disabled'
+    if (!mintingEnabled) return 'Mint Paused'
     if (remainingMints <= 0) return 'Max Mint Reached'
     return 'Mint'
   }
