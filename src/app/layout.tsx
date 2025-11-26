@@ -19,7 +19,7 @@ const geistMono = localFont({
 
 export const metadata: Metadata = {
   title: "Skullines",
-  description: "Skullines is a randomly generated collection of 1111 pixel-line skulls with unique trait layers, crafted for pure Farcaster vibes!",
+  description: "1111 pixel-line Skulls",
   other: {
     "fc:frame": JSON.stringify({
       version: "next",
