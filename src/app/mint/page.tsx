@@ -72,7 +72,7 @@ export default function MintPage() {
       const nftImageUrl = `https://ipfs.io/ipfs/${cid}/${lastTokenId}.png`
 
       await sdk.actions.composeCast({
-        text: `I just minted ${quantity} ${collectionName} 💀🔥\n${appUrl}`,
+        text: `I just minted ${collectionName} - stay degen, stay vibin 💀🔥\n${appUrl}`,
         embeds: [nftImageUrl]
       })
 
