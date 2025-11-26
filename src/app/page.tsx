@@ -44,7 +44,7 @@ export default function HomePage() {
             {nftName}
           </h1>
           <p className="text-sm sm:text-base text-white">
-            1111 pixel-line skulls with unique trait layers, crafted for pure Farcaster vibes!
+            Born on Base - forever on the Blockhain
           </p>
         </div>
 
