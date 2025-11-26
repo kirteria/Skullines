@@ -19,41 +19,41 @@ interface FarcasterWrapperProps {
   children: React.ReactNode
 }
 
-export default function FarcasterWrapper({ children }: FarcasterWrapperProps) {
-  const [sdkChecked, setSdkChecked] = useState(false)
-  const [inMiniApp, setInMiniApp] = useState(false)
+export default function FarcasterWrapper({ children }: FarcasterWrapperProps): JSX.Element {
+  const [sdkReady, setSdkReady] = useState(false)
   const router = useRouter()
 
   useEffect(() => {
-    const checkMiniApp = async () => {
+    const init = async () => {
+      setSdkReady(false)
       try {
-        const detected = await sdk.isInMiniApp()
-        setInMiniApp(detected)
-      } catch {
-        setInMiniApp(false)
-      } finally {
-        setSdkChecked(true)
+        const inMiniApp = await sdk.isInMiniApp()
+        if (inMiniApp && window.location.pathname !== '/mint') {
+          router.replace('/mint')
+        } else {
+          setSdkReady(true)
+        }
+      } catch (err) {
+        console.error('Error detecting Farcaster Mini App:', err)
+        setSdkReady(true)
       }
     }
 
-    checkMiniApp()
-  }, [])
+    init()
+  }, [router])
 
-  useEffect(() => {
-    if (sdkChecked && inMiniApp && window.location.pathname !== '/mint') {
-      router.replace('/mint')
-    }
-  }, [sdkChecked, inMiniApp, router])
-
-  if (!sdkChecked) {
-    return <div className="min-h-screen" style={{ backgroundColor: '#AA8AFB' }} />
+  if (!sdkReady) {
+    return null // wait silently until sdkReady
   }
 
   return (
     <FarcasterToastManager>
       {({ onManifestSuccess, onManifestError }) => (
         <>
-          <FarcasterManifestSigner onSuccess={onManifestSuccess} onError={onManifestError} />
+          <FarcasterManifestSigner
+            onSuccess={onManifestSuccess}
+            onError={onManifestError}
+          />
           {children}
         </>
       )}
