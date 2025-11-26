@@ -13,6 +13,7 @@ import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
  * /        \    <|  |  /  |_|  |_|  |   |  \  ___/ \___ \ 
  * /_______ /__|_ \____/|____/____/__|___|  /\___  >____  >
  *        \/     \/                       \/     \/     \/ 
+ * @author deployed by skullines.xyz
  */
 contract Skullines is ERC721, Ownable, ReentrancyGuard {
     uint256 private constant MAX_SUPPLY = 1000;
