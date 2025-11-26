@@ -46,7 +46,7 @@ export function NFTImageSlider({ className = '' }: NFTImageSliderProps): JSX.Ele
   if (images.length === 0) {
     return (
       <div
-        className={`aspect-square bg-[#AA8AFB] rounded-2xl shadow-lg ${className}`}
+        className={`aspect-square bg-[#101010] rounded-2xl shadow-lg ${className}`}
       />
     )
   }
