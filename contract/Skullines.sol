@@ -4,6 +4,8 @@ pragma solidity ^0.8.20;
 import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
+
 /**
  *  ___________         .__  .__  .__                      
  * /   _____/  | ____ __|  | |  | |__| ____   ____   ______
@@ -49,12 +51,7 @@ contract Base is ERC721, Ownable, ReentrancyGuard {
         require(mintingEnabled, "Minting is disabled");
         require(quantity > 0 && quantity <= 10, "Quantity must be between 1 and 10");
         require(msg.value == mintPrice * quantity, "Must send exact mint price for quantity");
-
-        require(
-            balanceOf(msg.sender) + quantity <= maxMintPerAddress,
-            "Would exceed max mint per address"
-        );
-
+        require(balanceOf(msg.sender) + quantity <= maxMintPerAddress, "Would exceed max mint per address");
         require(_nextTokenId + quantity - 1 <= MAX_SUPPLY, "Max supply reached");
 
         uint256 firstTokenId = _nextTokenId;
@@ -96,6 +93,18 @@ contract Base is ERC721, Ownable, ReentrancyGuard {
 
     function _baseURI() internal view override returns (string memory) {
         return _baseTokenUri;
+    }
+
+    function tokenURI(uint256 tokenId) public view override returns (string memory) {
+        _requireOwned(tokenId);
+
+        return string(
+            abi.encodePacked(
+                _baseTokenUri,
+                Strings.toString(tokenId),
+                ".json"
+            )
+        );
     }
 
     function setName(uint256 tokenId, string memory name) public {
