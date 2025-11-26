@@ -9,7 +9,7 @@
     "subtitle": "Born on Base",
     "description": "1111 pixel-line Skulls",
     "name": "Skullines",
-    "iconUrl": "https://skullines.xyz/icon.png",
+    "iconUrl": "https://skullines.xyz/skull.png",
     "homeUrl": "https://skullines.xyz",
     "imageUrl": "https://skullines.xyz/image.png",
     "buttonTitle": "Mint Skull",
@@ -21,7 +21,7 @@
     ],
     "primaryCategory": "utility",
     "ogTitle": "Skullines",
-    "ogImageUrl": "https://skullines.xyz/icon.png"
+    "ogImageUrl": "https://skullines.xyz/skull.png"
   },
   "baseBuilder": {
     "allowedAddresses": [
