@@ -12,12 +12,12 @@
   :root {
     --background: #101010;
     --foreground: #0A0A0A;
-    --card: #FFFFFF;
+    --card: #101010;
     --card-foreground: #0A0A0A;
-    --popover: #FFFFFF;
+    --popover: #101010;
     --popover-foreground: #0A0A0A;
     --primary: #171717;
-    --primary-foreground: #FFFFFF;
+    --primary-foreground: #101010;
     --secondary: #F5F5F5;
     --secondary-foreground: #171717;
     --muted: #F5F5F5;
@@ -25,7 +25,7 @@
     --accent: #F5F5F5;
     --accent-foreground: #171717;
     --destructive: #D53F3F;
-    --destructive-foreground: #FFFFFF;
+    --destructive-foreground: #101010;
     --border: #E5E5E5;
     --input: #E5E5E5;
     --ring: #0A0A0A;
