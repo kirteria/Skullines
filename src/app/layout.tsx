@@ -30,7 +30,7 @@ export const metadata: Metadata = {
           type: "launch_frame",
           name: "Skullines",
           url: "https://skullines.vercel.app",
-          splashImageUrl: "https://skullines.vercel.app/splash.gif",
+          splashImageUrl: "https://skullines.vercel.app/icon.png",
           splashBackgroundColor: "#AA8AFB",
         },
       },
