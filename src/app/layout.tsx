@@ -17,9 +17,9 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Your app name",
-  description: "Your app description",
-  other: { "fc:frame": JSON.stringify({"version":"next","imageUrl":"https://your-image-url","button":{"title":"Open App","action":{"type":"launch_frame","name":"Your app name","url":"https://farcaster-minting-dapp.vercel.app","splashImageUrl":"https://your-splash-image-url","splashBackgroundColor":"#ffffff"}}}) }
+  title: "Skullines",
+  description: "Skullines is born on Base - forever on the Blockhain",
+  other: { "fc:frame": JSON.stringify({"version":"next","imageUrl":"https://your-image-url","button":{"title":"Mint Skull","action":{"type":"launch_frame","name":"Skullines","url":"https://farcaster-minting-dapp.vercel.app","splashImageUrl":"https://your-splash-image-url","splashBackgroundColor":"#AA8AFB"}}}) }
 };
 
 export default async function RootLayout({
