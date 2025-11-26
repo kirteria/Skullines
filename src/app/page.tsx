@@ -32,7 +32,7 @@ export default function HomePage() {
   return (
     <div
       className="min-h-screen flex items-center justify-center p-4"
-      style={{ backgroundColor: '#AA8AFB' }}
+      style={{ backgroundColor: '#101010' }}
     >
       <div className="max-w-sm w-full flex flex-col items-center text-center space-y-4">
         <div className="w-22 h-22 rounded-2xl overflow-hidden shadow-lg">
@@ -52,8 +52,8 @@ export default function HomePage() {
           onClick={handleOpenApp}
           className="px-6 py-5 text-base sm:text-lg rounded-full shadow-lg w-full"
           style={{
-            backgroundColor: '#7A5CD9',
-            border: '1px solid #6B4CCC',
+            backgroundColor: '#6A3CFF',
+            border: '1px solid #5631CF',
             color: '#FFFFFF'
           }}
         >
