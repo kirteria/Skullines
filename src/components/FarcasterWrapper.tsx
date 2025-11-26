@@ -1,4 +1,3 @@
-
 'use client'
 
 import { useEffect, useState } from 'react'
@@ -7,56 +6,56 @@ import { useRouter } from 'next/navigation'
 import { sdk } from '@farcaster/miniapp-sdk'
 
 const FarcasterToastManager = dynamic(() => import('./FarcasterToastManager'), {
-ssr: false,
-loading: () => null
+  ssr: false,
+  loading: () => null
 })
 
 const FarcasterManifestSigner = dynamic(() => import('./FarcasterManifestSigner'), {
-ssr: false,
-loading: () => null
+  ssr: false,
+  loading: () => null
 })
 
 interface FarcasterWrapperProps {
-children: React.ReactNode
+  children: React.ReactNode
 }
 
 export default function FarcasterWrapper({ children }: FarcasterWrapperProps): JSX.Element {
-const [isMounted, setIsMounted] = useState(false)
-const router = useRouter()
+  const [sdkReady, setSdkReady] = useState(false)
+  const router = useRouter()
 
-useEffect(() => {
-setIsMounted(true)
+  useEffect(() => {
+    const checkMiniApp = async () => {
+      try {
+        const inMiniApp = await sdk.isInMiniApp()
+        if (inMiniApp && window.location.pathname !== '/mint') {
+          router.replace('/mint')
+        } else {
+          setSdkReady(true)
+        }
+      } catch (err) {
+        console.error('Farcaster SDK check failed', err)
+        setSdkReady(true)
+      }
+    }
 
-const redirectIfMiniApp = async () => {  
-  try {  
-    const inMiniApp = await sdk.isInMiniApp()  
-    if (inMiniApp && window.location.pathname !== '/mint') {  
-      router.replace('/mint')  
-    }  
-  } catch (err) {  
-    console.error('Error detecting Farcaster Mini App:', err)  
-  }  
-}  
+    checkMiniApp()
+  }, [router])
 
-redirectIfMiniApp()
+  if (!sdkReady) {
+    return <>{children}</>
+  }
 
-}, [router])
-
-if (!sdkReady) {
-return <>{children}</>
-}
-
-return (
-<FarcasterToastManager>
-{({ onManifestSuccess, onManifestError }) => (
-<>
-<FarcasterManifestSigner  
-onSuccess={onManifestSuccess}  
-onError={onManifestError}  
-/>
-{children}
-</>
-)}
-</FarcasterToastManager>
-)
+  return (
+    <FarcasterToastManager>
+      {({ onManifestSuccess, onManifestError }) => (
+        <>
+          <FarcasterManifestSigner
+            onSuccess={onManifestSuccess}
+            onError={onManifestError}
+          />
+          {children}
+        </>
+      )}
+    </FarcasterToastManager>
+  )
 }
