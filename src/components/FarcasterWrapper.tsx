@@ -1,3 +1,4 @@
+
 'use client'
 
 import { useEffect, useState } from 'react'
@@ -21,7 +22,6 @@ children: React.ReactNode
 
 export default function FarcasterWrapper({ children }: FarcasterWrapperProps): JSX.Element {
 const [isMounted, setIsMounted] = useState(false)
-const [isChecking, setIsChecking] = useState(true)
 const router = useRouter()
 
 useEffect(() => {
@@ -32,18 +32,19 @@ const redirectIfMiniApp = async () => {
     const inMiniApp = await sdk.isInMiniApp()  
     if (inMiniApp && window.location.pathname !== '/mint') {  
       router.replace('/mint')  
-    } else {
-      setIsChecking(false)
-    }
+    }  
   } catch (err) {  
-    console.error('Error detecting Farcaster Mini App:', err)
-    setIsChecking(false)
+    console.error('Error detecting Farcaster Mini App:', err)  
   }  
 }  
 
 redirectIfMiniApp()
 
 }, [router])
+
+if (!isMounted) {
+return <>{children}</>
+}
 
 return (
 <FarcasterToastManager>
