@@ -14,7 +14,7 @@ import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
  * /_______ /__|_ \____/|____/____/__|___|  /\___  >____  >
  *        \/     \/                       \/     \/     \/ 
  */
-contract Base is ERC721, Ownable, ReentrancyGuard {
+contract Skullines is ERC721, Ownable, ReentrancyGuard {
     uint256 private constant MAX_SUPPLY = 1000;
     uint256 private constant MAX_NAME_LENGTH = 50;
 
