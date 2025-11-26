@@ -44,7 +44,7 @@ export default function HomePage() {
             {nftName}
           </h1>
           <p className="text-sm sm:text-base text-white">
-            Farcaster client required
+            1111 pixel-line skulls with unique trait layers, crafted for pure Farcaster vibes!
           </p>
         </div>
 
