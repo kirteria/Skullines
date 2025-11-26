@@ -72,7 +72,7 @@ export default function MintPage() {
       const nftImageUrl = `https://ipfs.io/ipfs/${cid}/${lastTokenId}.png`
 
       await sdk.actions.composeCast({
-        text: `Just minted ${collectionName} #${lastTokenId}! 🔥\n${appUrl}`,
+        text: `Iam just minted ${quantity} coollest ${collectionName} 💀 🔥\n${appUrl}`,
         embeds: [nftImageUrl]
       })
 
@@ -112,7 +112,7 @@ export default function MintPage() {
   return (
     <div
       className="min-h-screen flex flex-col items-center pt-10 px-4"
-      style={{ background: 'linear-gradient(to bottom, #3B82F6, #F0F9FF)' }}
+      style={{ backgroundColor: '#AA8AFB' }}
     >
       <div className="fixed top-6 right-4 flex gap-3 z-50">
         {xUrl && <a href={xUrl} target="_blank"><img src="/x.png" className="w-8 h-8 object-contain" /></a>}
@@ -142,17 +142,27 @@ export default function MintPage() {
         <Button
           onClick={() => quantity > 1 && setQuantity(quantity - 1)}
           disabled={quantity <= 1}
-          className="bg-blue-500 hover:bg-blue-600 text-white w-10 h-10 rounded-full shadow-lg disabled:opacity-50"
+          className="text-white w-10 h-10 rounded-full shadow-lg disabled:opacity-50"
+          style={{
+            backgroundColor: '#7A5CD9',
+            border: '1px solid #6B4CCC'
+          }}
         >
           <Minus className="w-4 h-4" />
         </Button>
+
         <div className="w-16 h-10 bg-white bg-opacity-20 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg">
           <span className="text-2xl font-bold text-white">{quantity}</span>
         </div>
+
         <Button
           onClick={() => quantity < maxQuantity && setQuantity(quantity + 1)}
           disabled={quantity >= maxQuantity}
-          className="bg-blue-500 hover:bg-blue-600 text-white w-10 h-10 rounded-full shadow-lg disabled:opacity-50"
+          className="text-white w-10 h-10 rounded-full shadow-lg disabled:opacity-50"
+          style={{
+            backgroundColor: '#7A5CD9',
+            border: '1px solid #6B4CCC'
+          }}
         >
           <Plus className="w-4 h-4" />
         </Button>
@@ -161,7 +171,11 @@ export default function MintPage() {
       <Button
         onClick={handleMint}
         disabled={disabled}
-        className="w-full max-w-md bg-blue-500 hover:bg-blue-600 text-white h-15 text-xl font-semibold rounded-full shadow-xl disabled:opacity-50"
+        className="w-full max-w-md text-white h-15 text-xl font-semibold rounded-full shadow-xl disabled:opacity-50"
+        style={{
+          backgroundColor: '#7A5CD9',
+          border: '1px solid #6B4CCC'
+        }}
       >
         {getButtonText()}
       </Button>
