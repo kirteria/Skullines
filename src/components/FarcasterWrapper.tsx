@@ -17,6 +17,7 @@ export default function FarcasterWrapper({ children }: FarcasterWrapperProps): J
   const router = useRouter()
 
   useEffect(() => {
+    let timeout: NodeJS.Timeout
     const detectMiniApp = async () => {
       try {
         const inMiniApp = await sdk.isInMiniApp()
@@ -29,10 +30,17 @@ export default function FarcasterWrapper({ children }: FarcasterWrapperProps): J
         setSdkReady(true)
       }
     }
+
+    timeout = setTimeout(() => setSdkReady(true), 3000)
+
     detectMiniApp()
+
+    return () => clearTimeout(timeout)
   }, [router])
 
-  if (!sdkReady) return <div className="min-h-screen" />
+  if (!sdkReady) {
+    return <div className="min-h-screen" />
+  }
 
   return (
     <FarcasterToastManager>
