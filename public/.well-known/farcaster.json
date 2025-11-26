@@ -1,31 +1,31 @@
 {
   "accountAssociation": {
-    "header": "Get from farcaster-dev tool",
+    "header": "",
     "payload": "",
     "signature": ""
   },
 {
   "miniapp": {
     "version": "1",
-    "subtitle": "Your shorten description",
-    "description": "Your app description",
-    "name": "Your app name",
-    "iconUrl": "Your app icon url",
+    "subtitle": "Skullines on Base",
+    "description": "Skullines is a randomly generated collection of 1111 pixel-line skulls with unique trait layers, crafted for pure Farcaster vibes!",
+    "name": "Skullines",
+    "iconUrl": "",
     "homeUrl": "https://farcaster-minting-dapp.vercel.app",
-    "imageUrl": "Your image url",
-    "buttonTitle": "Open App",
-    "splashImageUrl": "Your splash image url",
-    "splashBackgroundColor": "#ffffff",
+    "imageUrl": "",
+    "buttonTitle": "Mint Skull",
+    "splashImageUrl": "",
+    "splashBackgroundColor": "#AA8AFB",
     "tags": [
       "base"
     ],
     "primaryCategory": "utility",
-    "ogTitle": "Your app OG title",
-    "ogImageUrl": "Your OG url-can same like app url"
+    "ogTitle": "Skullines",
+    "ogImageUrl": ""
   },
   "baseBuilder": {
     "allowedAddresses": [
-      "Your Base address"
+      "0x28133C88AAFD30EbB8f9bE97dC42cff717014FEC"
     ]
   }
 }
