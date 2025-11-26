@@ -13,8 +13,8 @@
     "homeUrl": "https://skullines.xyz",
     "imageUrl": "https://skullines.xyz/image.png",
     "buttonTitle": "Mint Skull",
-    "splashImageUrl": "https://skullines.xyz/splash.gif",
-    "splashBackgroundColor": "#AA8AFB",
+    "splashImageUrl": "https://skullines.xyz/splash.png",
+    "splashBackgroundColor": "#101010",
     "tags": [
       "mini-app",
       "base"
