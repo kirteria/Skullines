@@ -1,4 +1,3 @@
-```typescript
 'use client'
 
 import { useEffect, useState } from 'react'
@@ -71,4 +70,3 @@ export default function FarcasterWrapper({ children }: FarcasterWrapperProps): J
     </FarcasterToastManager>
   )
 }
-```
