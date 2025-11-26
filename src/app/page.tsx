@@ -32,7 +32,7 @@ export default function HomePage() {
   return (
     <div
       className="min-h-screen flex items-center justify-center p-4"
-      style={{ background: 'linear-gradient(to bottom, #3B82F6, #F0F9FF)' }}
+      style={{ backgroundColor: '#AA8AFB' }}
     >
       <div className="max-w-sm w-full flex flex-col items-center text-center space-y-4">
         <div className="w-30 h-30 rounded-2xl overflow-hidden shadow-lg">
@@ -40,10 +40,10 @@ export default function HomePage() {
         </div>
 
         <div className="space-y-1">
-          <h1 className="text-2xl sm:text-3xl font-bold" style={{ color: '#FFFFFF' }}>
+          <h1 className="text-2xl sm:text-3xl font-bold text-white">
             {nftName}
           </h1>
-          <p className="text-sm sm:text-base" style={{ color: '#FFFFFF' }}>
+          <p className="text-sm sm:text-base text-white">
             Farcaster client required
           </p>
         </div>
@@ -51,12 +51,16 @@ export default function HomePage() {
         <Button
           onClick={handleOpenApp}
           className="px-6 py-5 text-base sm:text-lg rounded-full shadow-lg w-full"
-          style={{ backgroundColor: '#3B82F6', border: '1px solid #60A5FA', color: '#FFFFFF' }}
+          style={{
+            backgroundColor: '#7A5CD9',
+            border: '1px solid #6B4CCC',
+            color: '#FFFFFF'
+          }}
         >
           Visit Farcaster
         </Button>
 
-        <p className="text-xs sm:text-sm" style={{ color: '#FFFFFF' }}>
+        <p className="text-xs sm:text-sm text-white">
           You need farcaster client to access this mini app
         </p>
       </div>
