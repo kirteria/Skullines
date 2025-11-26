@@ -1,0 +1,31 @@
+{
+  "accountAssociation": {
+    "header": "Get from farcaster-dev tool",
+    "payload": "",
+    "signature": ""
+  },
+{
+  "miniapp": {
+    "version": "1",
+    "subtitle": "Your shorten description",
+    "description": "Your app description",
+    "name": "Your app name",
+    "iconUrl": "Your app icon url",
+    "homeUrl": "https://farcaster-minting-dapp.vercel.app",
+    "imageUrl": "Your image url",
+    "buttonTitle": "Open App",
+    "splashImageUrl": "Your splash image url",
+    "splashBackgroundColor": "#ffffff",
+    "tags": [
+      "base"
+    ],
+    "primaryCategory": "utility",
+    "ogTitle": "Your app OG title",
+    "ogImageUrl": "Your OG url-can same like app url"
+  },
+  "baseBuilder": {
+    "allowedAddresses": [
+      "Your Base address"
+    ]
+  }
+}
