@@ -112,7 +112,7 @@ export default function MintPage() {
   return (
     <div
       className="min-h-screen flex flex-col items-center pt-10 px-4"
-      style={{ backgroundColor: '#000000' }}
+      style={{ backgroundColor: '#AA8AFB' }}
     >
       <div className="fixed top-6 right-4 flex gap-3 z-50">
         {xUrl && <a href={xUrl} target="_blank"><img src="/x.png" className="w-8 h-8 object-contain" /></a>}
