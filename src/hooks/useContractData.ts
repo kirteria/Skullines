@@ -21,7 +21,7 @@ export function useContractData(userAddress?: string): ContractData {
     mintPrice: '0',
     maxMintPerAddress: 0,
     totalSupply: 0,
-    maxSupply: 1000,
+    maxSupply: 1111,
     mintingEnabled: false,
     loading: true,
     error: null,
