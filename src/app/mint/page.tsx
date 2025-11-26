@@ -112,7 +112,7 @@ export default function MintPage() {
   return (
     <div
       className="min-h-screen flex flex-col items-center pt-10 px-4"
-      style={{ backgroundColor: '#AA8AFB' }}
+      style={{ backgroundColor: '#101010' }}
     >
       <div className="fixed top-6 right-4 flex gap-3 z-50">
         {xUrl && <a href={xUrl} target="_blank"><img src="/x.png" className="w-8 h-8 object-contain" /></a>}
@@ -144,8 +144,8 @@ export default function MintPage() {
           disabled={quantity <= 1}
           className="text-white w-10 h-10 rounded-full shadow-lg disabled:opacity-50"
           style={{
-            backgroundColor: '#7A5CD9',
-            border: '1px solid #6B4CCC'
+            backgroundColor: '#6A3CFF',
+            border: '1px solid #5631CF'
           }}
         >
           <Minus className="w-4 h-4" />
@@ -160,8 +160,8 @@ export default function MintPage() {
           disabled={quantity >= maxQuantity}
           className="text-white w-10 h-10 rounded-full shadow-lg disabled:opacity-50"
           style={{
-            backgroundColor: '#7A5CD9',
-            border: '1px solid #6B4CCC'
+            backgroundColor: '#6A3CFF',
+            border: '1px solid #5631CF'
           }}
         >
           <Plus className="w-4 h-4" />
@@ -173,8 +173,8 @@ export default function MintPage() {
         disabled={disabled}
         className="w-full max-w-md text-white h-15 text-xl font-semibold rounded-full shadow-xl disabled:opacity-50"
         style={{
-          backgroundColor: '#7A5CD9',
-          border: '1px solid #6B4CCC'
+          backgroundColor: '#6A3CFF',
+          border: '1px solid #5631CF'
         }}
       >
         {getButtonText()}
