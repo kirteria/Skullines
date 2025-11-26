@@ -3,7 +3,7 @@ import localFont from 'next/font/local'
 import './globals.css'
 import { cookies } from 'next/headers'
 import FarcasterWrapper from "@/components/FarcasterWrapper"
-import { Providers } from "@/app/providers"
+import { Providers } from "@/providers"
 
 const geistSans = localFont({
   src: './fonts/GeistVF.woff',
