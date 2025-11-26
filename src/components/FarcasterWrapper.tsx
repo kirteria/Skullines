@@ -45,14 +45,6 @@ redirectIfMiniApp()
 
 }, [router])
 
-if (!isMounted || isChecking) {
-return (
-  <div className="fixed inset-0 bg-black flex items-center justify-center">
-    <img src="/splash.gif" alt="Loading" className="w-full h-full object-cover" />
-  </div>
-)
-}
-
 return (
 <FarcasterToastManager>
 {({ onManifestSuccess, onManifestError }) => (
