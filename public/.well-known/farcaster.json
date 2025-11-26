@@ -14,7 +14,7 @@
     "homeUrl": "https://skullines.vercel.app",
     "imageUrl": "https://skullines.vercel.app/image.png",
     "buttonTitle": "Mint Skull",
-    "splashImageUrl": "https://skullines.vercel.app/icon.png",
+    "splashImageUrl": "https://skullines.vercel.app/splash.gif",
     "splashBackgroundColor": "#AA8AFB",
     "tags": [
       "base"
