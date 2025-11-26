@@ -6,8 +6,8 @@
   },
   "miniapp": {
     "version": "1",
-    "subtitle": "Born on Base - forever on the Blockhain",
-    "description": "Skullines is a randomly generated collection of 1111 pixel-line skulls with unique trait layers, crafted for pure Farcaster vibes!",
+    "subtitle": "Born on Base",
+    "description": "1111 pixel-line Skulls",
     "name": "Skullines",
     "iconUrl": "https://skullines.xyz/icon.png",
     "homeUrl": "https://skullines.xyz",
@@ -16,6 +16,7 @@
     "splashImageUrl": "https://skullines.xyz/splash.gif",
     "splashBackgroundColor": "#AA8AFB",
     "tags": [
+      "mini-app",
       "base"
     ],
     "primaryCategory": "utility",
