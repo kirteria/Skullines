@@ -27,26 +27,26 @@ export default function FarcasterWrapper({ children }: FarcasterWrapperProps): J
   useEffect(() => {
     setIsMounted(true)
 
-    const redirectIfMiniApp = async () => {
-      setIsChecking(true)
-      try {
-        const inMiniApp = await sdk.isInMiniApp()
-        if (inMiniApp && window.location.pathname !== '/mint') {
+    const redirectIfMiniApp = async () => {  
+      try {  
+        const inMiniApp = await sdk.isInMiniApp()  
+        if (inMiniApp && window.location.pathname !== '/mint') {  
           router.replace('/mint')
+        } else {
+          setIsChecking(false)
         }
-      } catch (err) {
+      } catch (err) {  
         console.error('Error detecting Farcaster Mini App:', err)
-      } finally {
         setIsChecking(false)
-      }
-    }
+      }  
+    }  
 
     redirectIfMiniApp()
   }, [router])
 
   if (!isMounted || isChecking) {
     return (
-      <div className="fixed inset-0 flex items-center justify-center bg-[#AA8AFB]">
+      <div className="fixed inset-0 bg-black flex items-center justify-center">
         <img 
           src="/splash.gif" 
           alt="Loading" 
@@ -60,9 +60,9 @@ export default function FarcasterWrapper({ children }: FarcasterWrapperProps): J
     <FarcasterToastManager>
       {({ onManifestSuccess, onManifestError }) => (
         <>
-          <FarcasterManifestSigner
-            onSuccess={onManifestSuccess}
-            onError={onManifestError}
+          <FarcasterManifestSigner  
+            onSuccess={onManifestSuccess}  
+            onError={onManifestError}  
           />
           {children}
         </>
