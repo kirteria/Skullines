@@ -7,21 +7,21 @@
 {
   "miniapp": {
     "version": "1",
-    "subtitle": "Skullines on Base",
+    "subtitle": "Born on Base - forever on the Blockhain",
     "description": "Skullines is a randomly generated collection of 1111 pixel-line skulls with unique trait layers, crafted for pure Farcaster vibes!",
     "name": "Skullines",
-    "iconUrl": "",
-    "homeUrl": "https://farcaster-minting-dapp.vercel.app",
-    "imageUrl": "",
+    "iconUrl": "https://skullines.vercel.app/icon.png",
+    "homeUrl": "https://skullines.vercel.app",
+    "imageUrl": "https://skullines.vercel.app/image.png",
     "buttonTitle": "Mint Skull",
-    "splashImageUrl": "",
+    "splashImageUrl": "https://skullines.vercel.app/splash.gif",
     "splashBackgroundColor": "#AA8AFB",
     "tags": [
       "base"
     ],
     "primaryCategory": "utility",
     "ogTitle": "Skullines",
-    "ogImageUrl": ""
+    "ogImageUrl": "https://skullines.vercel.app/icon.png"
   },
   "baseBuilder": {
     "allowedAddresses": [
