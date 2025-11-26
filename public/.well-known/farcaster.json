@@ -1,10 +1,9 @@
 {
   "accountAssociation": {
-    "header": "",
-    "payload": "",
-    "signature": ""
+    "header": "eyJmaWQiOjMwMTk3NiwidHlwZSI6ImN1c3RvZHkiLCJrZXkiOiIweDg2OWZCNTJCNzRkMDIxNENGZEU2MjU1NjczN0FBZDEzMjgyOUVGOTgifQ",
+    "payload": "eyJkb21haW4iOiJza3VsbGluZXMudmVyY2VsLmFwcCJ9",
+    "signature": "EfJVQJpaoY8KoiGNb9FyPeIMyuhN7vyFzXngmx61KA1d92/xfJGZDlIIRI3haOD3sV5DRFuqHEIlduBtJaj9IBw="
   },
-{
   "miniapp": {
     "version": "1",
     "subtitle": "Born on Base - forever on the Blockhain",
