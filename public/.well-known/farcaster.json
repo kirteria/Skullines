@@ -20,8 +20,11 @@
       "base"
     ],
     "primaryCategory": "utility",
+    "tagline": "Born on Base",
     "ogTitle": "Skullines",
-    "ogImageUrl": "https://skullines.xyz/skull.png"
+    "ogDescription": "1111 pixel line Skulls",
+    "ogImageUrl": "https://skullines.xyz/skull.png",
+    "noindex": true
   },
   "baseBuilder": {
     "allowedAddresses": [
