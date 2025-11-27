@@ -72,8 +72,8 @@ export default function MintPage() {
       const nftImageUrl = `https://${cid}.ipfs.dweb.link/${lastTokenId}.png`
 
       await sdk.actions.composeCast({
-        text: `Just minted my ${collectionName} 💜\n\u200B\nGet yours now 💀🔥\n${appUrl}`,
-        embeds: [nftImageUrl]
+        text: `Just minted my ${collectionName} 💜\n\u200B\nGet yours now 💀🔥`,
+        embeds: [nftImageUrl, appUrl]
       })
 
       setStatus('idle')
