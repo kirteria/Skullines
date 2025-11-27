@@ -9,7 +9,7 @@ interface NFTImageSliderProps {
 
 export function NFTImageSlider({ className = '' }: NFTImageSliderProps): JSX.Element {
   const [currentIndex, setCurrentIndex] = useState(0)
-  const [images, setImages] = useState<string[]>([])
+  const [images, setImages] = useState<string[]>(['/default.gif']) // default shown instantly
 
   useEffect(() => {
     const detectImages = async () => {
@@ -29,8 +29,9 @@ export function NFTImageSlider({ className = '' }: NFTImageSliderProps): JSX.Ele
 
       if (detected.length > 0) {
         setImages(['/default.gif', ...detected])
-      } else {
-        setImages(['/default.gif'])
+
+        // IMPORTANT: force first slide to real image
+        setTimeout(() => setCurrentIndex(1), 50)
       }
     }
 
