@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   other: {
     "fc:frame": JSON.stringify({
       version: "next",
-      imageUrl: "https://skullines.xyz/image.gif",
+      imageUrl: "https://skullines.xyz/skullines.gif",
       button: {
         title: "Mint Skull",
         action: {
