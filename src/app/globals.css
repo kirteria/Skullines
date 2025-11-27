@@ -35,21 +35,6 @@
   * {
     @apply border-border;
   }
-
-  @keyframes glitch {
-  0% { opacity: 1; }
-  20% { opacity: .4; transform: translate(2px, -2px); }
-  40% { opacity: .8; transform: translate(-2px, 2px); }
-  60% { opacity: .3; transform: translate(3px, -1px); }
-  80% { opacity: 1; transform: translate(-1px, 1px); }
-  100% { opacity: 1; transform: none; }
-}
-
-.animate-glitch {
-  animation: glitch 0.6s linear infinite;
-}
-  
-
   body {
     @apply bg-background text-foreground;
   }
