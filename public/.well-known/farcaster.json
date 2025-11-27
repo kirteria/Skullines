@@ -7,7 +7,7 @@
   "miniapp": {
     "version": "1",
     "subtitle": "Born on Base",
-    "description": "1111 pixel line Skulls",
+    "description": "Pixel line Skull",
     "name": "Skullines",
     "iconUrl": "https://skullines.xyz/skull.png",
     "homeUrl": "https://skullines.xyz",
@@ -22,7 +22,7 @@
     "primaryCategory": "utility",
     "tagline": "Born on Base",
     "ogTitle": "Skullines",
-    "ogDescription": "1111 pixel line Skulls",
+    "ogDescription": "Pixel line Skull",
     "ogImageUrl": "https://skullines.xyz/skull.png",
     "noindex": true
   },
