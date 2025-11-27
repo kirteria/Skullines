@@ -9,7 +9,8 @@ interface NFTImageSliderProps {
 
 export function NFTImageSlider({ className = '' }: NFTImageSliderProps): JSX.Element {
   const [currentIndex, setCurrentIndex] = useState(0)
-  const [images, setImages] = useState<string[]>(['/default.gif']) // default shown instantly
+  const [realImages, setRealImages] = useState<string[]>([])
+  const [showDefault, setShowDefault] = useState(true)
 
   useEffect(() => {
     const detectImages = async () => {
@@ -17,46 +18,58 @@ export function NFTImageSlider({ className = '' }: NFTImageSliderProps): JSX.Ele
 
       for (let i = 1; i <= 100; i++) {
         const imgPath = `/image/nft/${i}.png`
-
         try {
-          const response = await fetch(imgPath, { method: 'HEAD' })
-          if (response.ok) detected.push(imgPath)
+          const head = await fetch(imgPath, { method: 'HEAD' })
+          if (head.ok) detected.push(imgPath)
           else break
         } catch {
           break
         }
       }
 
-      if (detected.length > 0) {
-        setImages(['/default.gif', ...detected])
-
-        // IMPORTANT: force first slide to real image
-        setTimeout(() => setCurrentIndex(1), 50)
-      }
+      setRealImages(detected)
     }
 
     detectImages()
   }, [])
 
   useEffect(() => {
-    if (images.length <= 1) return
+    if (realImages.length === 0) return
+    const timer = setTimeout(() => setShowDefault(false), 3000)
+    return () => clearTimeout(timer)
+  }, [realImages])
+
+  useEffect(() => {
+    if (showDefault || realImages.length <= 1) return
 
     const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % images.length)
+      setCurrentIndex((prev) => (prev + 1) % realImages.length)
     }, 3000)
 
     return () => clearInterval(interval)
-  }, [images.length])
+  }, [showDefault, realImages])
 
   return (
     <div
       className={`aspect-square bg-[#101010] rounded-2xl overflow-hidden shadow-lg relative ${className}`}
     >
-      {images.map((img, index) => (
+      {showDefault && (
+        <div className="absolute inset-0 animate-glitch">
+          <Image
+            src="/default.gif"
+            alt=""
+            fill
+            className="object-cover"
+            sizes="280px"
+          />
+        </div>
+      )}
+
+      {realImages.map((img, index) => (
         <div
-          key={img + index}
-          className={`absolute inset-0 transition-transform duration-500 ${
-            index === currentIndex ? 'translate-x-0' : 'translate-x-full'
+          key={img}
+          className={`absolute inset-0 transition-opacity duration-500 ${
+            !showDefault && index === currentIndex ? 'opacity-100' : 'opacity-0'
           }`}
         >
           <Image
@@ -65,7 +78,6 @@ export function NFTImageSlider({ className = '' }: NFTImageSliderProps): JSX.Ele
             fill
             className="object-cover"
             sizes="280px"
-            priority={index === 0}
           />
         </div>
       ))}
