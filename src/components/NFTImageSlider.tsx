@@ -6,48 +6,42 @@ import Image from 'next/image'
 export function NFTImageSlider({ className = '' }) {
   const [realImages, setRealImages] = useState<string[]>([])
   const [currentIndex, setCurrentIndex] = useState(0)
-  const [showReal, setShowReal] = useState(false)
+  const [loadedFirst, setLoadedFirst] = useState(false)
   const [currentSrc, setCurrentSrc] = useState('/default.gif')
 
   // Detect images
   useEffect(() => {
-    const detect = async () => {
-      const imgs: string[] = []
+    const detectImages = async () => {
+      const images: string[] = []
       for (let i = 1; i <= 100; i++) {
         const path = `/image/nft/${i}.png`
         try {
           const res = await fetch(path, { method: 'HEAD' })
           if (!res.ok) break
-          imgs.push(path)
+          images.push(path)
         } catch {
           break
         }
       }
-      setRealImages(imgs)
+      setRealImages(images)
     }
-    detect()
+
+    detectImages()
   }, [])
 
-  // Fade default -> first real
-  useEffect(() => {
-    if (realImages.length === 0) return
+  // Switch default -> real when FIRST real loads
+  const handleFirstLoad = () => {
+    if (!loadedFirst) setLoadedFirst(true)
+  }
 
-    const timer = setTimeout(() => {
-      setCurrentSrc(realImages[0])
-      setShowReal(true) // triggers fade in
-    }, 1000)
-
-    return () => clearTimeout(timer)
-  }, [realImages])
-
-  // Real -> real (no animation)
+  // Rotate real images (NO animation)
   useEffect(() => {
     if (realImages.length <= 1) return
 
     const interval = setInterval(() => {
       setCurrentIndex(i => {
         const next = (i + 1) % realImages.length
-        setCurrentSrc(realImages[next]) // instant swap
+        setCurrentSrc(realImages[next])
         return next
       })
     }, 3000)
@@ -59,29 +53,28 @@ export function NFTImageSlider({ className = '' }) {
     <div
       className={`aspect-square bg-[#101010] rounded-2xl overflow-hidden relative ${className}`}
     >
-
-      {/* Default Image Layer (fades out) */}
+      {/* Default Image: fades OUT */}
       <Image
         src="/default.gif"
-        alt=""
+        alt="default"
         fill
         sizes="280px"
-        className={`absolute inset-0 object-cover transition-opacity duration-700 ${
-          showReal ? 'opacity-0' : 'opacity-100'
+        className={`absolute inset-0 object-cover transition-opacity duration-800 ${
+          loadedFirst ? 'opacity-0' : 'opacity-100'
         }`}
       />
 
-      {/* Real Image Layer (fades in ONCE) */}
+      {/* First real load triggers fade */}
       <Image
         src={currentSrc}
-        alt=""
+        alt="nft"
+        onLoadingComplete={handleFirstLoad}
         fill
         sizes="280px"
-        className={`absolute inset-0 object-cover transition-opacity duration-700 ${
-          showReal ? 'opacity-100' : 'opacity-0'
+        className={`absolute inset-0 object-cover transition-opacity duration-800 ${
+          loadedFirst ? 'opacity-100' : 'opacity-0'
         }`}
       />
-
     </div>
   )
 }
