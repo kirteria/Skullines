@@ -10,7 +10,7 @@ interface NFTImageSliderProps {
 export function NFTImageSlider({ className = '' }: NFTImageSliderProps): JSX.Element {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [realImages, setRealImages] = useState<string[]>([])
-  const [showDefault, setShowDefault] = useState(true)
+  const [currentSrc, setCurrentSrc] = useState('/default.gif')
 
   useEffect(() => {
     const detectImages = async () => {
@@ -33,48 +33,39 @@ export function NFTImageSlider({ className = '' }: NFTImageSliderProps): JSX.Ele
     detectImages()
   }, [])
 
-  // hide default after 2 sec if real images exist
   useEffect(() => {
     if (realImages.length === 0) return
-    const timer = setTimeout(() => setShowDefault(false), 2000)
+    const timer = setTimeout(() => {
+      setCurrentSrc(realImages[0])
+    }, 1000)
     return () => clearTimeout(timer)
   }, [realImages])
 
-  // real image slider
   useEffect(() => {
-    if (showDefault || realImages.length <= 1) return
+    if (realImages.length <= 1) return
+
     const interval = setInterval(() => {
-      setCurrentIndex((i) => (i + 1) % realImages.length)
+      setCurrentIndex((i) => {
+        const next = (i + 1) % realImages.length
+        setCurrentSrc(realImages[next])
+        return next
+      })
     }, 3000)
+
     return () => clearInterval(interval)
-  }, [showDefault, realImages])
+  }, [realImages])
 
   return (
     <div
       className={`aspect-square bg-[#101010] rounded-2xl overflow-hidden shadow-lg relative ${className}`}
     >
-      {showDefault && (
-        <Image
-          src="/default.gif"
-          alt="default"
-          fill
-          className="object-cover absolute inset-0"
-          sizes="280px"
-        />
-      )}
-
-      {realImages.map((img, index) => (
-        <Image
-          key={img}
-          src={img}
-          alt="nft"
-          fill
-          sizes="280px"
-          className={`object-cover absolute inset-0 transition-opacity duration-500 ${
-            !showDefault && index === currentIndex ? 'opacity-100' : 'opacity-0'
-          }`}
-        />
-      ))}
+      <Image
+        src={currentSrc}
+        alt="nft"
+        fill
+        sizes="280px"
+        className="object-cover absolute inset-0"
+      />
     </div>
   )
 }
