@@ -27,7 +27,11 @@ export function NFTImageSlider({ className = '' }: NFTImageSliderProps): JSX.Ele
         }
       }
 
-      setImages(detected)
+      if (detected.length > 0) {
+        setImages(['/default.png', ...detected])
+      } else {
+        setImages(['/default.png'])
+      }
     }
 
     detectImages()
@@ -43,23 +47,15 @@ export function NFTImageSlider({ className = '' }: NFTImageSliderProps): JSX.Ele
     return () => clearInterval(interval)
   }, [images.length])
 
-  if (images.length === 0) {
-    return (
-      <div
-        className={`aspect-square bg-[#101010] rounded-2xl shadow-lg ${className}`}
-      />
-    )
-  }
-
   return (
     <div
       className={`aspect-square bg-[#AA8AFB] rounded-2xl overflow-hidden shadow-lg relative ${className}`}
     >
       {images.map((img, index) => (
         <div
-          key={img}
-          className={`absolute inset-0 transition-opacity duration-500 ${
-            index === currentIndex ? 'opacity-100' : 'opacity-0'
+          key={img + index}
+          className={`absolute inset-0 transition-transform duration-500 ${
+            index === currentIndex ? 'translate-x-0' : 'translate-x-full'
           }`}
         >
           <Image
