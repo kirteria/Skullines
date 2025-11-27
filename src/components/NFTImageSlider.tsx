@@ -19,9 +19,9 @@ export function NFTImageSlider({ className = '' }: NFTImageSliderProps): JSX.Ele
       for (let i = 1; i <= 100; i++) {
         const imgPath = `/image/nft/${i}.png`
         try {
-          const head = await fetch(imgPath, { method: 'HEAD' })
-          if (head.ok) detected.push(imgPath)
-          else break
+          const res = await fetch(imgPath, { method: 'HEAD' })
+          if (!res.ok) break
+          detected.push(imgPath)
         } catch {
           break
         }
@@ -33,19 +33,19 @@ export function NFTImageSlider({ className = '' }: NFTImageSliderProps): JSX.Ele
     detectImages()
   }, [])
 
+  // hide default after 2 sec if real images exist
   useEffect(() => {
     if (realImages.length === 0) return
-    const timer = setTimeout(() => setShowDefault(false), 3000)
+    const timer = setTimeout(() => setShowDefault(false), 2000)
     return () => clearTimeout(timer)
   }, [realImages])
 
+  // real image slider
   useEffect(() => {
     if (showDefault || realImages.length <= 1) return
-
     const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % realImages.length)
+      setCurrentIndex((i) => (i + 1) % realImages.length)
     }, 3000)
-
     return () => clearInterval(interval)
   }, [showDefault, realImages])
 
@@ -54,32 +54,26 @@ export function NFTImageSlider({ className = '' }: NFTImageSliderProps): JSX.Ele
       className={`aspect-square bg-[#101010] rounded-2xl overflow-hidden shadow-lg relative ${className}`}
     >
       {showDefault && (
-        <div className="absolute inset-0 animate-glitch">
-          <Image
-            src="/default.gif"
-            alt=""
-            fill
-            className="object-cover"
-            sizes="280px"
-          />
-        </div>
+        <Image
+          src="/default.gif"
+          alt="default"
+          fill
+          className="object-cover absolute inset-0"
+          sizes="280px"
+        />
       )}
 
       {realImages.map((img, index) => (
-        <div
+        <Image
           key={img}
-          className={`absolute inset-0 transition-opacity duration-500 ${
+          src={img}
+          alt="nft"
+          fill
+          sizes="280px"
+          className={`object-cover absolute inset-0 transition-opacity duration-500 ${
             !showDefault && index === currentIndex ? 'opacity-100' : 'opacity-0'
           }`}
-        >
-          <Image
-            src={img}
-            alt=""
-            fill
-            className="object-cover"
-            sizes="280px"
-          />
-        </div>
+        />
       ))}
     </div>
   )
