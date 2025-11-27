@@ -8,7 +8,7 @@ export function NFTImageSlider({ className = '' }) {
       className={`aspect-square bg-[#101010] rounded-2xl overflow-hidden relative ${className}`}
     >
       <Image
-        src="/default.gif"
+        src="/preview.gif"
         alt="nft"
         fill
         sizes="280px"
