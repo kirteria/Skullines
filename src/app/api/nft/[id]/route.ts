@@ -1,18 +1,18 @@
 import { NextResponse } from 'next/server'
 
 export async function GET(
-  req: Request,
-  { params }: { params: { id: string } }
+  request: Request,
+  context: { params: Record<string, string> }
 ) {
+  const id = context.params.id
   const cid = process.env.NEXT_PUBLIC_NFT_CID!
-  const url = `https://dweb.link/ipfs/${cid}/${params.id}.png`
 
-  const res = await fetch(url, {
-    headers: { 'Cache-Control': 'public, max-age=31536000, immutable' }
-  })
+  const url = `https://dweb.link/ipfs/${cid}/${id}.png`
+
+  const res = await fetch(url)
 
   if (!res.ok) {
-    return NextResponse.json({ error: 'Image not found' }, { status: 404 })
+    return NextResponse.json({ error: 'Not found' }, { status: 404 })
   }
 
   const buffer = await res.arrayBuffer()
