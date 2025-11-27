@@ -28,9 +28,9 @@ export function NFTImageSlider({ className = '' }: NFTImageSliderProps): JSX.Ele
       }
 
       if (detected.length > 0) {
-        setImages(['/default.png', ...detected])
+        setImages(['/default.gif', ...detected])
       } else {
-        setImages(['/default.png'])
+        setImages(['/default.gif'])
       }
     }
 
