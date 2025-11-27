@@ -115,9 +115,9 @@ export default function MintPage() {
       style={{ backgroundColor: '#101010' }}
     >
       <div className="fixed top-6 right-4 flex gap-3 z-50">
-        {xUrl && <a href={xUrl} target="_blank"><img src="/x.png" className="w-8 h-8 object-contain" /></a>}
-        {farcasterUrl && <a href={farcasterUrl} target="_blank"><img src="/farcaster.png" className="w-8 h-8 object-contain" /></a>}
-        {openseaUrl && <a href={openseaUrl} target="_blank"><img src="/opensea.png" className="w-8 h-8 object-contain" /></a>}
+        {xUrl && <a href={xUrl} target="_blank"><img src="/x.png" className="w-6 h-6 object-contain" /></a>}
+        {farcasterUrl && <a href={farcasterUrl} target="_blank"><img src="/farcaster.png" className="w-6 h-6 object-contain" /></a>}
+        {openseaUrl && <a href={openseaUrl} target="_blank"><img src="/opensea.png" className="w-6 h-6 object-contain" /></a>}
       </div>
 
       <div className="w-full max-w-md mx-auto mb-4 mt-16">
