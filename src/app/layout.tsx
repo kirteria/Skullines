@@ -19,7 +19,7 @@ const geistMono = localFont({
 
 export const metadata: Metadata = {
   title: "Skullines",
-  description: "1111 pixel-line Skulls",
+  description: "1111 pixel line Skulls",
   other: {
     "fc:frame": JSON.stringify({
       version: "next",
