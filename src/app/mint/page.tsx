@@ -72,7 +72,7 @@ export default function MintPage() {
       const nftImageUrl = `https://ipfs.io/ipfs/${cid}/${lastTokenId}.png`
 
       await sdk.actions.composeCast({
-        text: `Just minted my ${collectionName} 💜\n\nGet yours now 💀🔥\n${appUrl}`,
+        text: `Just minted my ${collectionName} 💜\n \nGet yours now 💀🔥\n${appUrl}`,
         embeds: [nftImageUrl]
       })
 
@@ -85,8 +85,8 @@ export default function MintPage() {
   }
 
   const getButtonText = () => {
-    if (status === 'pending') return 'Confirm Transaction'
-    if (status === 'confirming') return 'Casting'
+    if (status === 'pending') return 'Processing'
+    if (status === 'confirming') return 'Processing'
     if (status === 'success') return 'Mint Successfully'
     if (status === 'failed') return 'Mint Rejected'
     if (loading) return 'Loading'
