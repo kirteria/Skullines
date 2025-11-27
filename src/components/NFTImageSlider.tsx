@@ -9,7 +9,6 @@ export function NFTImageSlider({ className = '' }) {
   const [currentSrc, setCurrentSrc] = useState('/default.gif')
   const [isFirstLoad, setIsFirstLoad] = useState(true) // fade only once
 
-  // Detect NFT images
   useEffect(() => {
     const detect = async () => {
       const arr: string[] = []
@@ -28,26 +27,24 @@ export function NFTImageSlider({ className = '' }) {
     detect()
   }, [])
 
-  // First transition: default → first real (with fade)
   useEffect(() => {
     if (realImages.length === 0) return
 
     const timer = setTimeout(() => {
       setCurrentSrc(realImages[0])
-      setIsFirstLoad(false) // disable fade after first load
-    }, 1000)
+      setIsFirstLoad(false) 
+    }, 2000)
 
     return () => clearTimeout(timer)
   }, [realImages])
 
-  // Real → real (no animation)
   useEffect(() => {
     if (realImages.length <= 1) return
 
     const interval = setInterval(() => {
       setCurrentIndex(i => {
         const next = (i + 1) % realImages.length
-        setCurrentSrc(realImages[next]) // instant change
+        setCurrentSrc(realImages[next])
         return next
       })
     }, 3000)
