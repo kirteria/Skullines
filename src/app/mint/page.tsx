@@ -13,7 +13,7 @@ import { notFound } from 'next/navigation'
 
 export default function MintPage() {
   const [quantity, setQuantity] = useState(1)
-  const [status, setStatus] = useState<'idle' | 'pending' | 'confirming' | 'success' | 'failed'>('idle')
+  const [status, setStatus] = useState<'idle' | 'pending' | 'confirming' | 'success' | 'failed' | 'cancelled'>('idle')
   const [isInFarcaster, setIsInFarcaster] = useState<boolean | null>(null)
 
   const { address, isConnected } = useAccount()
@@ -55,6 +55,7 @@ export default function MintPage() {
 
     try {
       setStatus('pending')
+
       const mintedIds = await mintNFT(quantity, mintPrice)
 
       if (!mintedIds || mintedIds.length === 0) {
@@ -66,7 +67,6 @@ export default function MintPage() {
       setStatus('confirming')
 
       const lastTokenId = mintedIds[mintedIds.length - 1]
-      const cid = process.env.NEXT_PUBLIC_NFT_CID!
       const appUrl = process.env.NEXT_PUBLIC_APP_URL!
       const collectionName = process.env.NEXT_PUBLIC_NFT_NAME!
       const nftImageUrl = `${process.env.NEXT_PUBLIC_APP_URL}/api/nft/${lastTokenId}`
@@ -76,19 +76,27 @@ export default function MintPage() {
         embeds: [nftImageUrl, appUrl]
       })
 
-      setStatus('idle')
+      setStatus('success')
       await refetch()
-    } catch {
-      setStatus('failed')
+      reset()
+
+    } catch (err: any) {
+      console.error(err)
+      if (err?.code === 4001) {
+        setStatus('cancelled')
+      } else {
+        setStatus('failed')
+      }
       reset()
     }
   }
 
   const getButtonText = () => {
     if (status === 'pending') return 'Processing'
-    if (status === 'confirming') return 'Processing'
+    if (status === 'confirming') return 'Verifying'
     if (status === 'success') return 'Mint Successfully'
-    if (status === 'failed') return 'Mint Rejected'
+    if (status === 'failed') return 'Mint Failed'
+    if (status === 'cancelled') return 'Mint Cancelled'
     if (loading) return 'Loading'
     if (isSoldOut) return 'Minted Out'
     if (!mintingEnabled) return 'Mint Paused'
@@ -120,8 +128,13 @@ export default function MintPage() {
         {openseaUrl && <a href={openseaUrl} target="_blank"><img src="/opensea.png" className="w-7 h-7 object-contain" /></a>}
       </div>
 
-      <div className="w-full max-w-md mx-auto mb-4 mt-16">
-        <NFTImageSlider className="w-full aspect-square" />
+      <div className="relative w-full max-w-md mx-auto mb-4 mt-16">
+        <NFTImageSlider className="w-full aspect-square rounded-2xl" />
+        {!loading && mintPrice && (
+          <div className="absolute top-2 left-2 bg-black bg-opacity-70 px-3 py-1 rounded-full text-white text-sm font-bold shadow-lg">
+            {formatEth(Number(mintPrice) * quantity)} ETH
+          </div>
+        )}
       </div>
 
       <div className="w-full max-w-md mx-auto mb-3">
@@ -131,12 +144,6 @@ export default function MintPage() {
         </div>
         <Progress value={progressPercentage} className="h-2 rounded-full" />
       </div>
-
-      {!loading && mintPrice && (
-        <p className="text-3xl font-bold text-center mb-3 text-white">
-          {formatEth(Number(mintPrice) * quantity)} ETH
-        </p>
-      )}
 
       <div className="flex items-center justify-center gap-3 mb-4">
         <Button
