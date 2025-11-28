@@ -12,7 +12,7 @@ export function NFTImageSlider({ className = '' }: NFTImageSliderProps) {
       className={`aspect-square bg-[#101010] rounded-2xl overflow-hidden relative ${className}`}
     >
       <Image
-        src="/preview.gif"
+        src="/skull.png"
         alt="nft"
         fill
         sizes="280px"
