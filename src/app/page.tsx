@@ -13,7 +13,7 @@ import { Blocked } from '@/components/Blocked'
 
 export default function HomePage() {
   const [quantity, setQuantity] = useState(1)
-  const [status, setStatus] = useState < "idle" | "processing" | "verifying" | "pending" | "success" | "failed" >("idle");
+  const [status, setStatus] = useState<"idle" | "processing" | "verifying" | "success" | "failed" | "cancelled">("idle")
   const [isInFarcaster, setIsInFarcaster] = useState<boolean | null>(null)
 
   const { address, isConnected } = useAccount()
@@ -24,11 +24,10 @@ export default function HomePage() {
   const maxQuantity = remainingMints
   const isSoldOut = totalSupply >= maxSupply
   const progressPercentage = (totalSupply / maxSupply) * 100
-
   const formatEth = (v: number) => parseFloat(v.toFixed(7)).toString()
 
   useEffect(() => {
-    const initFarcaster = async () => {
+    const init = async () => {
       try {
         await sdk.actions.ready()
         const inApp = await sdk.isInMiniApp()
@@ -37,22 +36,22 @@ export default function HomePage() {
         setIsInFarcaster(false)
       }
     }
-    initFarcaster()
+    init()
   }, [])
 
   if (isInFarcaster === null) return null
   if (isInFarcaster === false) return <Blocked />
 
   useEffect(() => {
-    if (isPending && status === 'idle') setStatus('pending')
+    if (isPending && status === 'idle') setStatus('processing')
   }, [isPending])
 
   useEffect(() => {
-    if (status === 'pending' && isConfirming) setStatus('confirming')
+    if (status === 'processing' && isConfirming) setStatus('verifying')
   }, [isConfirming])
 
   useEffect(() => {
-    if (status === 'confirming' && isSuccess) setStatus('success')
+    if (status === 'verifying' && isSuccess) setStatus('success')
   }, [isSuccess])
 
   useEffect(() => {
@@ -69,30 +68,29 @@ export default function HomePage() {
   const handleMint = async () => {
     if (!isConnected || !mintPrice || status !== 'idle') return
 
-    try {
-      const ids = await mintNFT(quantity, mintPrice)
-      if (!ids || ids.length === 0) return
+    const ids = await mintNFT(quantity, mintPrice)
+    if (!ids || ids.length === 0) return
 
-      await refetch()
+    await refetch()
 
-      const lastTokenId = ids[ids.length - 1]
-      const appUrl = process.env.NEXT_PUBLIC_APP_URL!
-      const collectionName = process.env.NEXT_PUBLIC_NFT_NAME!
-      const nftImageUrl = `${appUrl}/api/nft/${lastTokenId}`
+    if (status !== "success") return
 
-      if (status === 'success') {
-        await sdk.actions.composeCast({
-          text: `Just minted my ${collectionName} 💜\n\u200B\nGet yours now 💀🔥`,
-          embeds: [nftImageUrl, appUrl],
-        })
-        setTimeout(() => setStatus('idle'), 0)
-      }
-    } catch {}
+    const lastTokenId = ids[ids.length - 1]
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL!
+    const collectionName = process.env.NEXT_PUBLIC_NFT_NAME!
+    const nftImageUrl = `${appUrl}/api/nft/${lastTokenId}`
+
+    await sdk.actions.composeCast({
+      text: `Just minted my ${collectionName} 💜\n\u200B\nGet yours now 💀🔥`,
+      embeds: [nftImageUrl, appUrl]
+    })
+
+    setStatus('idle')
   }
 
   const getButtonText = () => {
-    if (status === 'pending') return 'Processing'
-    if (status === 'confirming') return 'Verifying'
+    if (status === 'processing') return 'Processing'
+    if (status === 'verifying') return 'Verifying'
     if (status === 'success') return 'Mint Successfully'
     if (status === 'failed') return 'Mint Failed'
     if (status === 'cancelled') return 'Mint Canceled'
@@ -128,9 +126,11 @@ export default function HomePage() {
         <Button onClick={() => setQuantity(q => Math.max(1, q - 1))} disabled={status !== 'idle' || quantity <= 1} className="text-white w-10 h-10 rounded-full">
           <Minus className="w-4 h-4" />
         </Button>
+
         <div className="w-16 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
           <span className="text-2xl font-bold text-white">{quantity}</span>
         </div>
+
         <Button onClick={() => setQuantity(q => Math.min(maxQuantity, q + 1))} disabled={status !== 'idle' || quantity >= maxQuantity} className="text-white w-10 h-10 rounded-full">
           <Plus className="w-4 h-4" />
         </Button>
