@@ -25,6 +25,7 @@ export default function HomePage() {
   const isSoldOut = totalSupply >= maxSupply  
   const progressPercentage = (totalSupply/maxSupply)*100  
   const formatEth = (v:number)=>parseFloat(v.toFixed(7)).toString()  
+  const isDataReady = !loading && typeof totalSupply === 'number' && typeof maxSupply === 'number' && typeof mintingEnabled === 'boolean'  
   
   useEffect(()=>{  
     const initFarcaster = async ()=>{  
@@ -45,31 +46,31 @@ export default function HomePage() {
   const handleMint = async () => {  
     if(!isConnected || !mintPrice || status!=='idle') return  
   
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL!  
+    const collectionName = process.env.NEXT_PUBLIC_NFT_NAME!  
+    
     const minted = await mintNFT(quantity, mintPrice, {  
       onPending: () => {  
-        setStatus('pending')  
+        setStatus('pending') 
       },  
       onConfirming: () => {  
-        setStatus('confirming')  
+        setStatus('confirming')
       },  
       onSuccess: async () => {  
-        setStatus('success')  
+        setStatus('success')
         await refetch()  
-  
-        const lastTokenId = minted?.[minted.length - 1]  
-        if (lastTokenId) {  
-          const appUrl = process.env.NEXT_PUBLIC_APP_URL!  
-          const collectionName = process.env.NEXT_PUBLIC_NFT_NAME!  
-          const nftImageUrl = `${appUrl}/api/nft/${lastTokenId}`  
-  
-          try {  
+   
+        try {  
+          const lastTokenId = minted?.[minted.length - 1]  
+          if (lastTokenId) {  
+            const nftImageUrl = `${appUrl}/api/nft/${lastTokenId}`  
             await sdk.actions.composeCast({  
-              text: `Just minted my ${collectionName} 💜\n\u200B\nGet yours now 💀🔥`,  
+              text: `Just minted my ${collectionName} 💜\n\nGet yours now 💀🔥`,  
               embeds: [nftImageUrl, appUrl]  
             })  
-          } catch (err) {  
-            console.error('Failed to compose cast:', err)  
           }  
+        } catch (err) {  
+          console.error('Failed to compose cast:', err)   
         }  
   
         setTimeout(() => setStatus('idle'), 0)  
@@ -91,17 +92,20 @@ export default function HomePage() {
     if(status==='success') return 'Mint Successfully'  
     if(status==='failed') return 'Mint Failed'  
     if(status==='cancelled') return 'Mint Canceled'  
-    if(loading) return 'Mint'
+      
+    if(!isDataReady) return 'Mint'  
+      
     if(isSoldOut) return 'Minted Out'  
     if(!mintingEnabled) return 'Mint Paused'  
     if(remainingMints<=0) return 'Max Mint Reached'  
+      
     return 'Mint'  
   }  
   
   const disabled =  
     status!=='idle' ||  
     !isConnected ||  
-    loading ||
+    !isDataReady || 
     isSoldOut ||  
     !mintingEnabled ||  
     remainingMints<=0  
@@ -113,9 +117,9 @@ export default function HomePage() {
   return (  
     <div className="min-h-screen flex flex-col items-center pt-10 px-4" style={{ backgroundColor:'#101010' }}>  
       <div className="fixed top-6 right-4 flex gap-3 z-50">  
-        {xUrl && <a href={xUrl} target="_blank"><img src="/x.png" className="w-7 h-7"/></a>}  
-        {farcasterUrl && <a href={farcasterUrl} target="_blank"><img src="/farcaster.png" className="w-7 h-7"/></a>}  
-        {openseaUrl && <a href={openseaUrl} target="_blank"><img src="/opensea.png" className="w-7 h-7"/></a>}  
+        {xUrl && <a href={xUrl} target="_blank" rel="noopener noreferrer"><img src="/x.png" alt="X" className="w-7 h-7"/></a>}  
+        {farcasterUrl && <a href={farcasterUrl} target="_blank" rel="noopener noreferrer"><img src="/farcaster.png" alt="Farcaster" className="w-7 h-7"/></a>}  
+        {openseaUrl && <a href={openseaUrl} target="_blank" rel="noopener noreferrer"><img src="/opensea.png" alt="OpenSea" className="w-7 h-7"/></a>}  
       </div>  
   
       <div className="relative w-full max-w-md mx-auto mb-4 mt-16">  
@@ -131,7 +135,7 @@ export default function HomePage() {
         <div className="flex justify-between text-sm mb-1">  
           <span className="font-bold text-white">Minted</span>  
           <span className="font-semibold text-white">  
-            {loading?'...':`${totalSupply}/${maxSupply}`}  
+            {!isDataReady?'...':`${totalSupply}/${maxSupply}`}  
           </span>  
         </div>  
         <Progress value={progressPercentage} className="h-2 rounded-full"/>  
