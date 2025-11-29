@@ -100,6 +100,7 @@ export default function HomePage() {
   const disabled =  
     status!=='idle' ||  
     !isConnected ||  
+    loading ||
     isSoldOut ||  
     !mintingEnabled ||  
     remainingMints<=0  
