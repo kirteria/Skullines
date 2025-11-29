@@ -13,7 +13,9 @@ import { Blocked } from '@/components/Blocked'
 
 export default function HomePage() {
   const [quantity, setQuantity] = useState(1)
-  const [status, setStatus] = useState<'idle' | 'pending' | 'confirming' | 'success' | 'failed' | 'cancelled'>('idle')
+  const [status, setStatus] = useState<
+    'idle' | 'pending' | 'confirming' | 'success' | 'failed' | 'cancelled'
+  >('idle')
   const [isInFarcaster, setIsInFarcaster] = useState<boolean | null>(null)
 
   const { address, isConnected } = useAccount()
@@ -26,7 +28,7 @@ export default function HomePage() {
     mintingEnabled,
     loading,
     mintPrice,
-    refetch
+    refetch,
   } = useContractData(address)
 
   const { mintNFT } = useMint()
@@ -35,6 +37,7 @@ export default function HomePage() {
   const maxQuantity = remainingMints
   const isSoldOut = totalSupply >= maxSupply
   const progressPercentage = (totalSupply / maxSupply) * 100
+
   const formatEth = (v: number) => parseFloat(v.toFixed(7)).toString()
   const reset = () => setTimeout(() => setStatus('idle'), 1000)
 
@@ -60,6 +63,7 @@ export default function HomePage() {
 
     try {
       setStatus('pending')
+
       const mintedIds = await mintNFT(quantity, mintPrice)
 
       if (!mintedIds || mintedIds.length === 0) {
@@ -77,7 +81,7 @@ export default function HomePage() {
 
       await sdk.actions.composeCast({
         text: `Just minted my ${collectionName} 💜\n\u200B\nGet yours now 💀🔥`,
-        embeds: [nftImageUrl, appUrl]
+        embeds: [nftImageUrl, appUrl],
       })
 
       setStatus('success')
@@ -85,6 +89,7 @@ export default function HomePage() {
       reset()
     } catch (err: any) {
       console.error(err)
+
       if (err?.code === 4001) {
         setStatus('cancelled')
       } else {
@@ -106,14 +111,13 @@ export default function HomePage() {
     if (remainingMints <= 0) return 'Max Mint Reached'
     return 'Mint'
   }
-
+  
   const disabled =
+    status !== 'idle' ||
     !isConnected ||
     loading ||
     isSoldOut ||
     !mintingEnabled ||
-    status === 'pending' ||
-    status === 'confirming' ||
     remainingMints <= 0
 
   const xUrl = process.env.NEXT_PUBLIC_X_URL
@@ -126,9 +130,21 @@ export default function HomePage() {
       style={{ backgroundColor: '#101010' }}
     >
       <div className="fixed top-6 right-4 flex gap-3 z-50">
-        {xUrl && <a href={xUrl} target="_blank"><img src="/x.png" className="w-7 h-7 object-contain" /></a>}
-        {farcasterUrl && <a href={farcasterUrl} target="_blank"><img src="/farcaster.png" className="w-7 h-7 object-contain" /></a>}
-        {openseaUrl && <a href={openseaUrl} target="_blank"><img src="/opensea.png" className="w-7 h-7 object-contain" /></a>}
+        {xUrl && (
+          <a href={xUrl} target="_blank">
+            <img src="/x.png" className="w-7 h-7 object-contain" />
+          </a>
+        )}
+        {farcasterUrl && (
+          <a href={farcasterUrl} target="_blank">
+            <img src="/farcaster.png" className="w-7 h-7 object-contain" />
+          </a>
+        )}
+        {openseaUrl && (
+          <a href={openseaUrl} target="_blank">
+            <img src="/opensea.png" className="w-7 h-7 object-contain" />
+          </a>
+        )}
       </div>
 
       <div className="relative w-full max-w-md mx-auto mb-4 mt-16">
@@ -143,7 +159,9 @@ export default function HomePage() {
       <div className="w-full max-w-md mx-auto mb-3">
         <div className="flex justify-between text-sm mb-1">
           <span className="font-bold text-white">Minted</span>
-          <span className="font-semibold text-white">{loading ? '...' : `${totalSupply}/${maxSupply}`}</span>
+          <span className="font-semibold text-white">
+            {loading ? '...' : `${totalSupply}/${maxSupply}`}
+          </span>
         </div>
         <Progress value={progressPercentage} className="h-2 rounded-full" />
       </div>
@@ -151,7 +169,7 @@ export default function HomePage() {
       <div className="flex items-center justify-center gap-3 mb-4">
         <Button
           onClick={() => quantity > 1 && setQuantity(quantity - 1)}
-          disabled={quantity <= 1}
+          disabled={quantity <= 1 || status !== 'idle'}
           className="text-white w-10 h-10 rounded-full shadow-lg disabled:opacity-50"
           style={{ backgroundColor: '#6A3CFF', border: '1px solid #5631CF' }}
         >
@@ -164,7 +182,7 @@ export default function HomePage() {
 
         <Button
           onClick={() => quantity < maxQuantity && setQuantity(quantity + 1)}
-          disabled={quantity >= maxQuantity}
+          disabled={quantity >= maxQuantity || status !== 'idle'}
           className="text-white w-10 h-10 rounded-full shadow-lg disabled:opacity-50"
           style={{ backgroundColor: '#6A3CFF', border: '1px solid #5631CF' }}
         >
