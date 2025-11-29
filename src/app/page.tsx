@@ -7,7 +7,7 @@ import { Progress } from '@/components/ui/progress'
 import { Minus, Plus } from 'lucide-react'
 import { useContractData } from '@/hooks/useContractData'
 import { useMint } from '@/hooks/useMint'
-import { NFTImageSlider } from '@/components/NFTImageSlider'
+import { NFTPreview } from '@/components/NFTPreview'
 import { sdk } from '@farcaster/miniapp-sdk'
 import { notFound } from 'next/navigation'
 
@@ -132,7 +132,7 @@ export default function HomePage() {
       </div>
 
       <div className="relative w-full max-w-md mx-auto mb-4 mt-16">
-        <NFTImageSlider className="w-full aspect-square rounded-2xl" />
+        <NFTPreview className="w-full aspect-square rounded-2xl" />
         {!loading && mintPrice && (
           <div className="absolute top-2 left-2 bg-black bg-opacity-70 px-3 py-1 rounded-full text-white text-sm font-bold shadow-lg">
             {formatEth(Number(mintPrice))} ETH
