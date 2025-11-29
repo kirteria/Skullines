@@ -18,7 +18,7 @@ export default function HomePage() {
 
   const { address, isConnected } = useAccount()
   const { totalSupply, maxSupply, userBalance, maxMintPerAddress, mintingEnabled, loading, mintPrice, refetch } = useContractData(address)
-  const { mintNFT, error } = useMint()
+  const { mintNFT } = useMint()
 
   const remainingMints = Math.max((maxMintPerAddress || 0) - (userBalance || 0), 0)
   const maxQuantity = remainingMints
@@ -43,46 +43,47 @@ export default function HomePage() {
   if (isInFarcaster === false) return <Blocked />
 
   const handleMint = async () => {
-  const handleMint = async () => {
-  if (!isConnected || !mintPrice || status !== 'idle') return
+    if (!isConnected || !mintPrice || status !== 'idle') return
 
-  setStatus('pending')
+    try {
+      setStatus('pending')
+      let mintedIds
+      try {
+        mintedIds = await mintNFT(quantity, mintPrice)
+      } catch (err: any) {
+        if (err?.message === 'USER_CANCELLED' || err?.code === 4001) setStatus('cancelled')
+        else setStatus('failed')
+        setTimeout(() => setStatus('idle'), 1000)
+        return
+      }
 
-  try {
-    const mintedIds = await mintNFT(quantity, mintPrice)
+      if (!mintedIds || mintedIds.length === 0) {
+        setStatus('cancelled')
+        setTimeout(() => setStatus('idle'), 1000)
+        return
+      }
 
-    if (!mintedIds) {
-      setStatus('cancelled')  
-      setTimeout(() => setStatus('idle'), 1000)
-      return
-    }
+      setStatus('confirming')
 
-    setStatus('confirming')
+      const lastTokenId = mintedIds[mintedIds.length - 1]
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL!
+      const collectionName = process.env.NEXT_PUBLIC_NFT_NAME!
+      const nftImageUrl = `${appUrl}/api/nft/${lastTokenId}`
 
-    const lastTokenId = mintedIds[mintedIds.length - 1]
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL!
-    const collectionName = process.env.NEXT_PUBLIC_NFT_NAME!
-    const nftImageUrl = `${appUrl}/api/nft/${lastTokenId}`
+      setStatus('success')
+      await refetch()
 
-    setStatus('success')
-    await refetch()
+      await sdk.actions.composeCast({
+        text: `Just minted my ${collectionName} 💜\n\u200B\nGet yours now 💀🔥`,
+        embeds: [nftImageUrl, appUrl],
+      })
 
-    await sdk.actions.composeCast({
-      text: `Just minted my ${collectionName} 💜\n\u200B\nGet yours now 💀🔥`,
-      embeds: [nftImageUrl, appUrl],
-    })
-
-    setTimeout(() => setStatus('idle'), 0)
-
-  } catch (err: any) {
-    if (err?.message === 'USER_CANCELLED' || err?.code === 4001) {
-      setStatus('cancelled')
-    } else {
+      setTimeout(() => setStatus('idle'), 0)
+    } catch (err) {
       setStatus('failed')
+      setTimeout(() => setStatus('idle'), 1000)
     }
-    setTimeout(() => setStatus('idle'), 1000)
   }
-}
 
   const getButtonText = () => {
     if (status === 'pending') return 'Processing'
@@ -111,7 +112,6 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen flex flex-col items-center pt-10 px-4" style={{ backgroundColor: '#101010' }}>
-      
       <div className="fixed top-6 right-4 flex gap-3 z-50">
         {xUrl && <a href={xUrl} target="_blank"><img src="/x.png" className="w-7 h-7" /></a>}
         {farcasterUrl && <a href={farcasterUrl} target="_blank"><img src="/farcaster.png" className="w-7 h-7" /></a>}
@@ -169,7 +169,6 @@ export default function HomePage() {
       >
         {getButtonText()}
       </Button>
-
     </div>
   )
 }
