@@ -72,7 +72,7 @@ export default function HomePage() {
           }  
         }  
   
-        setTimeout(() => setStatus('idle'), 1500)  
+        setTimeout(() => setStatus('idle'), 0)  
       },  
       onFailed: () => {  
         setStatus('failed')  
