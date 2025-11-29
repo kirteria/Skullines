@@ -73,7 +73,7 @@ export default function HomePage() {
 
     await refetch()
 
-    if (status !== "success") return
+    if (!ids || ids.length === 0) return
 
     const lastTokenId = ids[ids.length - 1]
     const appUrl = process.env.NEXT_PUBLIC_APP_URL!
