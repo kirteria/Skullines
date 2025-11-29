@@ -48,22 +48,28 @@ export default function HomePage() {
     try {
       setStatus('pending')
       const mintedIds = await mintNFT(quantity, mintPrice)
+
       if (!mintedIds || mintedIds.length === 0) {
         setStatus('failed')
         setTimeout(() => setStatus('idle'), 2000)
         return
       }
+
       setStatus('confirming')
+
       const lastTokenId = mintedIds[mintedIds.length - 1]
       const appUrl = process.env.NEXT_PUBLIC_APP_URL!
       const collectionName = process.env.NEXT_PUBLIC_NFT_NAME!
       const nftImageUrl = `${process.env.NEXT_PUBLIC_APP_URL}/api/nft/${lastTokenId}`
+
       setStatus('success')
       await refetch()
+
       await sdk.actions.composeCast({
         text: `Just minted my ${collectionName} 💜\n\u200B\nGet yours now 💀🔥`,
-        embeds: [nftImageUrl, appUrl]
+        embeds: [nftImageUrl, appUrl],
       })
+
       setTimeout(() => setStatus('idle'), 2000)
     } catch (err: any) {
       if (err?.code === 4001) setStatus('cancelled')
@@ -85,7 +91,7 @@ export default function HomePage() {
     return 'Mint'
   }
 
-  const disabled = status === 'pending' || status === 'confirming' || !isConnected || loading || isSoldOut || !mintingEnabled || remainingMints <= 0
+  const disabled = status !== 'idle' || !isConnected || loading || isSoldOut || !mintingEnabled || remainingMints <= 0
 
   const xUrl = process.env.NEXT_PUBLIC_X_URL
   const farcasterUrl = process.env.NEXT_PUBLIC_FARCASTER_URL
@@ -117,13 +123,13 @@ export default function HomePage() {
       </div>
 
       <div className="flex items-center justify-center gap-3 mb-4">
-        <Button onClick={() => setQuantity(q => Math.max(1, q - 1))} disabled={quantity <= 1 || status !== 'idle'} className="text-white w-10 h-10 rounded-full shadow-lg disabled:opacity-50" style={{ backgroundColor: '#6A3CFF', border: '1px solid #5631CF' }}>
+        <Button onClick={() => setQuantity(q => Math.max(1, q - 1))} disabled={status !== 'idle' || quantity <= 1} className="text-white w-10 h-10 rounded-full shadow-lg disabled:opacity-50" style={{ backgroundColor: '#6A3CFF', border: '1px solid #5631CF' }}>
           <Minus className="w-4 h-4" />
         </Button>
         <div className="w-16 h-10 bg-white bg-opacity-20 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg">
           <span className="text-2xl font-bold text-white">{quantity}</span>
         </div>
-        <Button onClick={() => setQuantity(q => Math.min(maxQuantity, q + 1))} disabled={quantity >= maxQuantity || status !== 'idle'} className="text-white w-10 h-10 rounded-full shadow-lg disabled:opacity-50" style={{ backgroundColor: '#6A3CFF', border: '1px solid #5631CF' }}>
+        <Button onClick={() => setQuantity(q => Math.min(maxQuantity, q + 1))} disabled={status !== 'idle' || quantity >= maxQuantity} className="text-white w-10 h-10 rounded-full shadow-lg disabled:opacity-50" style={{ backgroundColor: '#6A3CFF', border: '1px solid #5631CF' }}>
           <Plus className="w-4 h-4" />
         </Button>
       </div>
