@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button'
 
-export default function NotFoundPage() {
+export function Blocked() {
   return (
     <div
       className="min-h-screen flex items-center justify-center p-4"
