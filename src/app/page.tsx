@@ -11,7 +11,7 @@ import { NFTImageSlider } from "@/components/NFTImageSlider"
 import { sdk } from "@farcaster/miniapp-sdk"
 import { notFound } from "next/navigation"
 
-export default function MintPage() {
+export default function Home() {
   const [quantity, setQuantity] = useState(1)
   const [status, setStatus] = useState<"idle" | "pending" | "confirming" | "success" | "failed" | "cancelled">("idle")
   const [isInFarcaster, setIsInFarcaster] = useState<boolean | null>(null)
