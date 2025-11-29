@@ -18,13 +18,18 @@ export default function HomePage() {
 
   const { address, isConnected } = useAccount()
   const { totalSupply, maxSupply, userBalance, maxMintPerAddress, mintingEnabled, loading, mintPrice, refetch } = useContractData(address)
-  const { mintNFT, isPending, error, mintedIds } = useMint()
+  const { mintNFT } = useMint()
 
   const remainingMints = Math.max((maxMintPerAddress || 0) - (userBalance || 0), 0)
   const maxQuantity = remainingMints
   const isSoldOut = totalSupply >= maxSupply
+  const isMaxMintReached = remainingMints <= 0
   const progressPercentage = (totalSupply / maxSupply) * 100
   const formatEth = (v: number) => parseFloat(v.toFixed(7)).toString()
+
+  useEffect(() => {
+    if (quantity > maxQuantity) setQuantity(maxQuantity > 0 ? maxQuantity : 1)
+  }, [maxQuantity])
 
   useEffect(() => {
     const initFarcaster = async () => {
@@ -90,7 +95,7 @@ export default function HomePage() {
     if (loading) return 'Loading'
     if (isSoldOut) return 'Minted Out'
     if (!mintingEnabled) return 'Mint Paused'
-    if (remainingMints <= 0) return 'Max Mint Reached'
+    if (isMaxMintReached) return 'Max Mint Reached'
     return 'Mint'
   }
 
@@ -100,7 +105,7 @@ export default function HomePage() {
     loading ||
     isSoldOut ||
     !mintingEnabled ||
-    remainingMints <= 0
+    isMaxMintReached
 
   const xUrl = process.env.NEXT_PUBLIC_X_URL
   const farcasterUrl = process.env.NEXT_PUBLIC_FARCASTER_URL
