@@ -18,7 +18,7 @@ export default function HomePage() {
 
   const { address, isConnected } = useAccount()
   const { totalSupply, maxSupply, userBalance, maxMintPerAddress, mintingEnabled, loading, mintPrice, refetch } = useContractData(address)
-  const { mintNFT } = useMint()
+  const { mintNFT, error } = useMint()
 
   const remainingMints = Math.max((maxMintPerAddress || 0) - (userBalance || 0), 0)
   const maxQuantity = remainingMints
@@ -47,28 +47,45 @@ export default function HomePage() {
 
     try {
       setStatus('pending')
+
       const mintedIds = await mintNFT(quantity, mintPrice)
-      if (!mintedIds || mintedIds.length === 0) {
-        setStatus('failed')
-        setTimeout(() => setStatus('idle'), 2000)
+
+      if (error?.message === 'USER_CANCELLED') {
+        setStatus('cancelled')
+        setTimeout(() => setStatus('idle'), 1000)
         return
       }
+
+      if (!mintedIds || mintedIds.length === 0) {
+        setStatus('failed')
+        setTimeout(() => setStatus('idle'), 1000)
+        return
+      }
+
       setStatus('confirming')
+
       const lastTokenId = mintedIds[mintedIds.length - 1]
       const appUrl = process.env.NEXT_PUBLIC_APP_URL!
       const collectionName = process.env.NEXT_PUBLIC_NFT_NAME!
-      const nftImageUrl = `${process.env.NEXT_PUBLIC_APP_URL}/api/nft/${lastTokenId}`
+      const nftImageUrl = `${appUrl}/api/nft/${lastTokenId}`
+
       setStatus('success')
       await refetch()
+
       await sdk.actions.composeCast({
         text: `Just minted my ${collectionName} 💜\n\u200B\nGet yours now 💀🔥`,
-        embeds: [nftImageUrl, appUrl]
+        embeds: [nftImageUrl, appUrl],
       })
-      setTimeout(() => setStatus('idle'), 2000)
+
+      setTimeout(() => setStatus('idle'), 0)
+
     } catch (err: any) {
-      if (err?.code === 4001) setStatus('cancelled')
-      else setStatus('failed')
-      setTimeout(() => setStatus('idle'), 2000)
+      if (err?.code === 4001 || err?.message === 'USER_CANCELLED') {
+        setStatus('cancelled')
+      } else {
+        setStatus('failed')
+      }
+      setTimeout(() => setStatus('idle'), 1000)
     }
   }
 
@@ -85,7 +102,13 @@ export default function HomePage() {
     return 'Mint'
   }
 
-  const disabled = status === 'pending' || status === 'confirming' || !isConnected || loading || isSoldOut || !mintingEnabled || remainingMints <= 0
+  const disabled =
+    status !== 'idle' ||
+    !isConnected ||
+    loading ||
+    isSoldOut ||
+    !mintingEnabled ||
+    remainingMints <= 0
 
   const xUrl = process.env.NEXT_PUBLIC_X_URL
   const farcasterUrl = process.env.NEXT_PUBLIC_FARCASTER_URL
@@ -93,10 +116,11 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen flex flex-col items-center pt-10 px-4" style={{ backgroundColor: '#101010' }}>
+      
       <div className="fixed top-6 right-4 flex gap-3 z-50">
-        {xUrl && <a href={xUrl} target="_blank"><img src="/x.png" className="w-7 h-7 object-contain" /></a>}
-        {farcasterUrl && <a href={farcasterUrl} target="_blank"><img src="/farcaster.png" className="w-7 h-7 object-contain" /></a>}
-        {openseaUrl && <a href={openseaUrl} target="_blank"><img src="/opensea.png" className="w-7 h-7 object-contain" /></a>}
+        {xUrl && <a href={xUrl} target="_blank"><img src="/x.png" className="w-7 h-7" /></a>}
+        {farcasterUrl && <a href={farcasterUrl} target="_blank"><img src="/farcaster.png" className="w-7 h-7" /></a>}
+        {openseaUrl && <a href={openseaUrl} target="_blank"><img src="/opensea.png" className="w-7 h-7" /></a>}
       </div>
 
       <div className="relative w-full max-w-md mx-auto mb-4 mt-16">
@@ -111,26 +135,46 @@ export default function HomePage() {
       <div className="w-full max-w-md mx-auto mb-3">
         <div className="flex justify-between text-sm mb-1">
           <span className="font-bold text-white">Minted</span>
-          <span className="font-semibold text-white">{loading ? '...' : `${totalSupply}/${maxSupply}`}</span>
+          <span className="font-semibold text-white">
+            {loading ? '...' : `${totalSupply}/${maxSupply}`}
+          </span>
         </div>
         <Progress value={progressPercentage} className="h-2 rounded-full" />
       </div>
 
       <div className="flex items-center justify-center gap-3 mb-4">
-        <Button onClick={() => setQuantity(q => Math.max(1, q - 1))} disabled={quantity <= 1 || status !== 'idle'} className="text-white w-10 h-10 rounded-full shadow-lg disabled:opacity-50" style={{ backgroundColor: '#6A3CFF', border: '1px solid #5631CF' }}>
+        <Button
+          onClick={() => setQuantity(q => Math.max(1, q - 1))}
+          disabled={status !== 'idle' || quantity <= 1}
+          className="text-white w-10 h-10 rounded-full shadow-lg disabled:opacity-50"
+          style={{ backgroundColor: '#6A3CFF', border: '1px solid #5631CF' }}
+        >
           <Minus className="w-4 h-4" />
         </Button>
+
         <div className="w-16 h-10 bg-white bg-opacity-20 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg">
           <span className="text-2xl font-bold text-white">{quantity}</span>
         </div>
-        <Button onClick={() => setQuantity(q => Math.min(maxQuantity, q + 1))} disabled={quantity >= maxQuantity || status !== 'idle'} className="text-white w-10 h-10 rounded-full shadow-lg disabled:opacity-50" style={{ backgroundColor: '#6A3CFF', border: '1px solid #5631CF' }}>
+
+        <Button
+          onClick={() => setQuantity(q => Math.min(maxQuantity, q + 1))}
+          disabled={status !== 'idle' || quantity >= maxQuantity}
+          className="text-white w-10 h-10 rounded-full shadow-lg disabled:opacity-50"
+          style={{ backgroundColor: '#6A3CFF', border: '1px solid #5631CF' }}
+        >
           <Plus className="w-4 h-4" />
         </Button>
       </div>
 
-      <Button onClick={handleMint} disabled={disabled} className="w-full max-w-md text-white h-15 text-xl font-semibold rounded-full shadow-xl disabled:opacity-50" style={{ backgroundColor: '#6A3CFF', border: '1px solid #5631CF' }}>
+      <Button
+        onClick={handleMint}
+        disabled={disabled}
+        className="w-full max-w-md text-white h-15 text-xl font-semibold rounded-full shadow-xl disabled:opacity-50"
+        style={{ backgroundColor: '#6A3CFF', border: '1px solid #5631CF' }}
+      >
         {getButtonText()}
       </Button>
+
     </div>
   )
 }
