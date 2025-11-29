@@ -43,40 +43,51 @@ export default function HomePage() {
   if (isInFarcaster === false) return <Blocked />
 
   const handleMint = async () => {
-    if (!isConnected || !mintPrice || status !== 'idle') return
+  if (!isConnected || !mintPrice || status !== 'idle') return
+
+  try {
+    setStatus('pending')
+    const mintedIds = await mintNFT(quantity, mintPrice)
+
+    if (!mintedIds || mintedIds.length === 0) {
+      setStatus('failed')
+      setTimeout(() => setStatus('idle'), 800)
+      return
+    }
+
+    setStatus('confirming')
+
+    const lastTokenId = mintedIds[mintedIds.length - 1]
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL!
+    const collectionName = process.env.NEXT_PUBLIC_NFT_NAME!
+    const nftImageUrl = `${appUrl}/api/nft/${lastTokenId}`
+
+    setStatus('success')
+    await refetch()
 
     try {
-      setStatus('pending')
-      const mintedIds = await mintNFT(quantity, mintPrice)
-
-      if (!mintedIds || mintedIds.length === 0) {
-        setStatus('failed')
-        setTimeout(() => setStatus('idle'), 1000)
-        return
-      }
-
-      setStatus('confirming')
-
-      const lastTokenId = mintedIds[mintedIds.length - 1]
-      const appUrl = process.env.NEXT_PUBLIC_APP_URL!
-      const collectionName = process.env.NEXT_PUBLIC_NFT_NAME!
-      const nftImageUrl = `${process.env.NEXT_PUBLIC_APP_URL}/api/nft/${lastTokenId}`
-
-      setStatus('success')
-      await refetch()
-
       await sdk.actions.composeCast({
         text: `Just minted my ${collectionName} 💜\n\u200B\nGet yours now 💀🔥`,
         embeds: [nftImageUrl, appUrl],
       })
-
-      setTimeout(() => setStatus('idle'), 0)
-    } catch (err: any) {
-      if (err?.code === 4001) setStatus('cancelled')
-      else setStatus('failed')
-      setTimeout(() => setStatus('idle'), 1000)
+    } catch (castErr) {
+      console.log("Cast failed:", castErr)
     }
+
+    setTimeout(() => setStatus('idle'), 0)
+
+  } catch (err: any) {
+    const message = err?.message?.toLowerCase() || ""
+
+    if (err?.code === 4001 || message.includes("reject") || message.includes("cancel")) {
+      setStatus('cancelled')
+    } else {
+      setStatus('failed')
+    }
+
+    setTimeout(() => setStatus('idle'), 800)
   }
+}
 
   const getButtonText = () => {
     if (status === 'pending') return 'Processing'
