@@ -13,7 +13,7 @@ import { Blocked } from '@/components/Blocked'
 
 export default function HomePage() {
   const [quantity, setQuantity] = useState(1)
-  const [status, setStatus] = useState<'idle' | 'pending' | 'confirming' | 'success' | 'failed' | 'cancelled'>('idle')
+  const [status, setStatus] = useState<'idle' | 'confirming' | 'success' | 'failed' | 'cancelled'>('idle')
   const [isInFarcaster, setIsInFarcaster] = useState<boolean | null>(null)
 
   const { address, isConnected } = useAccount()
@@ -50,7 +50,7 @@ export default function HomePage() {
   const handleMint = async () => {
     if (!isConnected || !mintPrice || status !== 'idle') return
 
-    setStatus('pending')
+    setStatus('confirming')
 
     let minted
     try {
@@ -67,8 +67,6 @@ export default function HomePage() {
       setTimeout(() => setStatus('idle'), 1000)
       return
     }
-
-    setStatus('confirming')
 
     const lastTokenId = minted[minted.length - 1]
     const appUrl = process.env.NEXT_PUBLIC_APP_URL!
@@ -87,7 +85,6 @@ export default function HomePage() {
   }
 
   const getButtonText = () => {
-    if (status === 'pending') return 'Processing'
     if (status === 'confirming') return 'Verifying'
     if (status === 'success') return 'Mint Successfully'
     if (status === 'failed') return 'Mint Failed'
