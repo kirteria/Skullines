@@ -132,7 +132,7 @@ export default function MintPage() {
         <NFTImageSlider className="w-full aspect-square rounded-2xl" />
         {!loading && mintPrice && (
           <div className="absolute top-2 left-2 bg-black bg-opacity-70 px-3 py-1 rounded-full text-white text-sm font-bold shadow-lg">
-            {formatEth(Number(mintPrice) * quantity)} ETH
+            {formatEth(Number(mintPrice))} ETH
           </div>
         )}
       </div>
