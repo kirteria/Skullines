@@ -14,21 +14,32 @@ export default function Page() {
   const [isInFarcaster, setIsInFarcaster] = useState<boolean | null>(null)
 
   useEffect(() => {
+    const checkTimeout = setTimeout(() => {
+      if (isInFarcaster === null) {
+        setIsInFarcaster(false)
+      }
+    }, 3000)
+
     sdk
       .isInMiniApp()
-      .then((inApp) => setIsInFarcaster(inApp))
-      .catch(() => setIsInFarcaster(false))
+      .then((inApp) => {
+        clearTimeout(checkTimeout)
+        setIsInFarcaster(inApp)
+      })
+      .catch(() => {
+        clearTimeout(checkTimeout)
+        setIsInFarcaster(false)
+      })
+
+    return () => clearTimeout(checkTimeout)
   }, [])
 
-  // While checking, return nothing to prevent flash
   if (isInFarcaster === null) return null
 
-  // If in Farcaster, show mint page
   if (isInFarcaster) {
     return <MintPageContent />
   }
 
-  // If not in Farcaster, show home/blocking page
   return <HomePageContent />
 }
 
