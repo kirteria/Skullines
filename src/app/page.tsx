@@ -31,10 +31,17 @@ export default function Home() {
   const reset = () => setTimeout(() => setStatus("idle"), 1000)
 
   useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (isInFarcaster === null) {
+        setIsInFarcaster(false)
+      }
+    }, 2000)
+
     sdk
       .isInMiniApp()
       .then((inApp) => setIsInFarcaster(inApp))
       .catch(() => setIsInFarcaster(false))
+      .finally(() => clearTimeout(timeout))
   }, [])
 
   if (isInFarcaster === false) {
