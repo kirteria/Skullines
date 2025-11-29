@@ -45,39 +45,25 @@ export default function HomePage() {
   const handleMint = async () => {
     if (!isConnected || !mintPrice || status !== 'idle') return
 
-    setStatus('pending')
-
-    let minted
-    try {
-      setStatus('confirming')
-      minted = await mintNFT(quantity, mintPrice)
-    } catch (err: any) {
-      if (err?.message === 'USER_CANCELLED' || err?.code === 4001) setStatus('cancelled')
-      else setStatus('failed')
-      setTimeout(() => setStatus('idle'), 1000)
-      return
-    }
-
-    if (!minted || minted.length === 0) {
-      setStatus('cancelled')
-      setTimeout(() => setStatus('idle'), 1000)
-      return
-    }
-
-    const lastTokenId = minted[minted.length - 1]
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL!
-    const collectionName = process.env.NEXT_PUBLIC_NFT_NAME!
-    const nftImageUrl = `${appUrl}/api/nft/${lastTokenId}`
-
-    setStatus('success')
-    await refetch()
-
-    await sdk.actions.composeCast({
-      text: `Just minted my ${collectionName} 💜\n\u200B\nGet yours now 💀🔥`,
-      embeds: [nftImageUrl, appUrl],
+    const minted = await mintNFT(quantity, mintPrice, {
+      onPending: () => setStatus('pending'),
+      onConfirming: () => setStatus('confirming'),
+      onSuccess: async (ids) => {                 
+        setStatus('success')
+        await refetch()
+        const lastTokenId = ids[ids.length - 1]
+        const appUrl = process.env.NEXT_PUBLIC_APP_URL!
+        const collectionName = process.env.NEXT_PUBLIC_NFT_NAME!
+        const nftImageUrl = `${appUrl}/api/nft/${lastTokenId}`
+        await sdk.actions.composeCast({
+          text: `Just minted my ${collectionName} 💜\n\u200B\nGet yours now 💀🔥`,
+          embeds: [nftImageUrl, appUrl],
+        })
+        setTimeout(() => setStatus('idle'), 0)
+      },
+      onFailed: () => setStatus('failed'),
+      onCancelled: () => setStatus('cancelled'),
     })
-
-    setTimeout(() => setStatus('idle'), 0)
   }
 
   const getButtonText = () => {
