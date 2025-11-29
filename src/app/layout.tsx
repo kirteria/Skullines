@@ -29,7 +29,7 @@ export const metadata: Metadata = {
         action: {
           type: "launch_frame",
           name: "Skullines",
-          url: "https://skullines.xyz/mint",
+          url: "https://skullines.xyz/",
           splashImageUrl: "https://skullines.xyz/splash.png",
           splashBackgroundColor: "#101010",
         },
