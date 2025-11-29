@@ -35,7 +35,7 @@ export default function HomePage() {
       style={{ backgroundColor: '#101010' }}
     >
       <div className="max-w-sm w-full flex flex-col items-center text-center space-y-4">
-        <div className="w-[21px] h-[21px] rounded-2xl overflow-hidden shadow-lg">
+        <div className="w-[80px] h-[80px] rounded-2xl overflow-hidden shadow-lg">
           <img src="/skull.png" alt="Logo" className="w-full h-full object-cover" />
         </div>
 
