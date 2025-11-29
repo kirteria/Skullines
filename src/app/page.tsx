@@ -51,7 +51,7 @@ export default function HomePage() {
 
       if (!mintedIds || mintedIds.length === 0) {
         setStatus('failed')
-        setTimeout(() => setStatus('idle'), 1000)
+        setTimeout(() => setStatus('idle'), 500)
         return
       }
 
@@ -70,11 +70,11 @@ export default function HomePage() {
         embeds: [nftImageUrl, appUrl],
       })
 
-      setTimeout(() => setStatus('idle'), 1000)
+      setTimeout(() => setStatus('idle'), 500)
     } catch (err: any) {
       if (err?.code === 4001) setStatus('cancelled')
       else setStatus('failed')
-      setTimeout(() => setStatus('idle'), 1000)
+      setTimeout(() => setStatus('idle'), 500)
     }
   }
 
