@@ -13,7 +13,7 @@ import { Blocked } from '@/components/Blocked'
 
 export default function HomePage() {
   const [quantity, setQuantity] = useState(1)
-  const [status, setStatus] = useState < "idle" | "processing" | "verifying" | | "pending" | "success" | "failed" >("idle");
+  const [status, setStatus] = useState < "idle" | "processing" | "verifying" | "pending" | "success" | "failed" >("idle");
   const [isInFarcaster, setIsInFarcaster] = useState<boolean | null>(null)
 
   const { address, isConnected } = useAccount()
