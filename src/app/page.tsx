@@ -91,7 +91,6 @@ export default function HomePage() {
     if(status==='success') return 'Mint Successfully'  
     if(status==='failed') return 'Mint Failed'  
     if(status==='cancelled') return 'Mint Canceled'  
-    if(loading) return 'Loading'  
     if(isSoldOut) return 'Minted Out'  
     if(!mintingEnabled) return 'Mint Paused'  
     if(remainingMints<=0) return 'Max Mint Reached'  
@@ -101,7 +100,6 @@ export default function HomePage() {
   const disabled =  
     status!=='idle' ||  
     !isConnected ||  
-    loading ||  
     isSoldOut ||  
     !mintingEnabled ||  
     remainingMints<=0  
