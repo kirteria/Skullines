@@ -9,7 +9,7 @@ import { useContractData } from '@/hooks/useContractData'
 import { useMint } from '@/hooks/useMint'
 import { NFTPreview } from '@/components/NFTPreview'
 import { sdk } from '@farcaster/miniapp-sdk'
-import { notFound } from 'next/navigation'
+import { Blocked } from '@/components/Blocked'
 
 export default function HomePage() {
   const [quantity, setQuantity] = useState(1)
@@ -53,7 +53,7 @@ export default function HomePage() {
   }, [])
 
   if (isInFarcaster === null) return null
-  if (isInFarcaster === false) notFound()
+  if (isInFarcaster === false) return <Blocked />
 
   const handleMint = async () => {
     if (!isConnected || !mintPrice) return
