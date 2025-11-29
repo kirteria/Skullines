@@ -46,6 +46,7 @@ export default function HomePage() {
     if (!isConnected || !mintPrice || status !== 'idle') return
 
     setStatus('pending')
+
     let minted
     try {
       minted = await mintNFT(quantity, mintPrice)
@@ -63,19 +64,22 @@ export default function HomePage() {
     }
 
     setStatus('confirming')
+
     const lastTokenId = minted[minted.length - 1]
     const appUrl = process.env.NEXT_PUBLIC_APP_URL!
     const collectionName = process.env.NEXT_PUBLIC_NFT_NAME!
     const nftImageUrl = `${appUrl}/api/nft/${lastTokenId}`
 
     await refetch()
-    await sdk.actions.composeCast({
-      text: `Just minted my ${collectionName} 💜\n\u200B\nGet yours now 💀🔥`,
-      embeds: [nftImageUrl, appUrl],
-    })
 
     setStatus('success')
-    setTimeout(() => setStatus('idle'), 2000)
+
+    sdk.actions.composeCast({
+      text: `Just minted my ${collectionName} 💜\n\u200B\nGet yours now 💀🔥`,
+      embeds: [nftImageUrl, appUrl],
+    }).catch(() => {})
+
+    setTimeout(() => setStatus('idle'), 0)
   }
 
   const getButtonText = () => {
