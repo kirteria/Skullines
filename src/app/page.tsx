@@ -18,7 +18,7 @@ export default function HomePage() {
 
   const { address, isConnected } = useAccount()
   const { totalSupply, maxSupply, userBalance, maxMintPerAddress, mintingEnabled, loading, mintPrice, refetch } = useContractData(address)
-  const { mintNFT } = useMint()
+  const { mintNFT, isPending, isConfirming, isSuccess, error, mintedIds } = useMint()
 
   const remainingMints = Math.max((maxMintPerAddress || 0) - (userBalance || 0), 0)
   const maxQuantity = remainingMints
@@ -39,72 +39,61 @@ export default function HomePage() {
     initFarcaster()
   }, [])
 
+  useEffect(() => {
+    if (status === 'pending' && isPending) setStatus('pending')
+    if (status === 'pending' && isConfirming) setStatus('confirming')
+    if (status === 'confirming' && isSuccess) setStatus('success')
+    if (error?.message === 'USER_CANCELLED') setStatus('cancelled')
+  }, [isPending, isConfirming, isSuccess, error, status])
+
   if (isInFarcaster === null) return null
   if (isInFarcaster === false) return <Blocked />
 
   const handleMint = async () => {
     if (!isConnected || !mintPrice || status !== 'idle') return
+    if (remainingMints <= 0) {
+      setStatus('failed')
+      return
+    }
 
+    setStatus('pending')
     try {
-      setStatus('pending')
-      let mintedIds
-      try {
-        mintedIds = await mintNFT(quantity, mintPrice)
-      } catch (err: any) {
-        if (err?.message === 'USER_CANCELLED' || err?.code === 4001) setStatus('cancelled')
+      const ids = await mintNFT(quantity, mintPrice)
+      if (!ids || ids.length === 0) {
+        if (error?.message === 'USER_CANCELLED') setStatus('cancelled')
         else setStatus('failed')
         setTimeout(() => setStatus('idle'), 1000)
         return
       }
-
-      if (!mintedIds || mintedIds.length === 0) {
-        setStatus('cancelled')
-        setTimeout(() => setStatus('idle'), 1000)
-        return
-      }
-
-      setStatus('confirming')
-
-      const lastTokenId = mintedIds[mintedIds.length - 1]
+      await refetch()
+      const lastTokenId = ids[ids.length - 1]
       const appUrl = process.env.NEXT_PUBLIC_APP_URL!
       const collectionName = process.env.NEXT_PUBLIC_NFT_NAME!
       const nftImageUrl = `${appUrl}/api/nft/${lastTokenId}`
-
-      setStatus('success')
-      await refetch()
-
       await sdk.actions.composeCast({
         text: `Just minted my ${collectionName} 💜\n\u200B\nGet yours now 💀🔥`,
         embeds: [nftImageUrl, appUrl],
       })
-
-      setTimeout(() => setStatus('idle'), 0)
-    } catch (err) {
+    } catch {
       setStatus('failed')
       setTimeout(() => setStatus('idle'), 1000)
     }
   }
 
   const getButtonText = () => {
+    if (loading) return 'Loading'
+    if (isSoldOut) return 'Minted Out'
+    if (!mintingEnabled) return 'Mint Paused'
+    if (remainingMints <= 0) return 'Max Mint Reached'
     if (status === 'pending') return 'Processing'
     if (status === 'confirming') return 'Verifying'
     if (status === 'success') return 'Mint Successfully'
     if (status === 'failed') return 'Mint Failed'
     if (status === 'cancelled') return 'Mint Canceled'
-    if (loading) return 'Loading'
-    if (isSoldOut) return 'Minted Out'
-    if (!mintingEnabled) return 'Mint Paused'
-    if (remainingMints <= 0) return 'Max Mint Reached'
     return 'Mint'
   }
 
-  const disabled =
-    status !== 'idle' ||
-    !isConnected ||
-    loading ||
-    isSoldOut ||
-    !mintingEnabled ||
-    remainingMints <= 0
+  const disabled = status !== 'idle' || !isConnected || loading || isSoldOut || !mintingEnabled || remainingMints <= 0
 
   const xUrl = process.env.NEXT_PUBLIC_X_URL
   const farcasterUrl = process.env.NEXT_PUBLIC_FARCASTER_URL
@@ -130,9 +119,7 @@ export default function HomePage() {
       <div className="w-full max-w-md mx-auto mb-3">
         <div className="flex justify-between text-sm mb-1">
           <span className="font-bold text-white">Minted</span>
-          <span className="font-semibold text-white">
-            {loading ? '...' : `${totalSupply}/${maxSupply}`}
-          </span>
+          <span className="font-semibold text-white">{loading ? '...' : `${totalSupply}/${maxSupply}`}</span>
         </div>
         <Progress value={progressPercentage} className="h-2 rounded-full" />
       </div>
