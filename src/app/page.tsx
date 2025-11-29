@@ -18,12 +18,13 @@ export default function HomePage() {
 
   const { address, isConnected } = useAccount()
   const { totalSupply, maxSupply, userBalance, maxMintPerAddress, mintingEnabled, loading, mintPrice, refetch } = useContractData(address)
-  const { mintNFT } = useMint()
+  const { mintNFT, isPending, isConfirming, isSuccess, error, mintedIds } = useMint()
 
   const remainingMints = Math.max((maxMintPerAddress || 0) - (userBalance || 0), 0)
   const maxQuantity = remainingMints
   const isSoldOut = totalSupply >= maxSupply
   const progressPercentage = (totalSupply / maxSupply) * 100
+
   const formatEth = (v: number) => parseFloat(v.toFixed(7)).toString()
 
   useEffect(() => {
@@ -42,52 +43,52 @@ export default function HomePage() {
   if (isInFarcaster === null) return null
   if (isInFarcaster === false) return <Blocked />
 
-  const handleMint = async () => {
-  if (!isConnected || !mintPrice || status !== 'idle') return
+  useEffect(() => {
+    if (isPending && status === 'idle') setStatus('pending')
+  }, [isPending])
 
-  try {
-    setStatus('pending')
-    const mintedIds = await mintNFT(quantity, mintPrice)
+  useEffect(() => {
+    if (status === 'pending' && isConfirming) setStatus('confirming')
+  }, [isConfirming])
 
-    if (!mintedIds || mintedIds.length === 0) {
-      setStatus('failed')
-      setTimeout(() => setStatus('idle'), 800)
-      return
+  useEffect(() => {
+    if (status === 'confirming' && isSuccess) setStatus('success')
+  }, [isSuccess])
+
+  useEffect(() => {
+    if (error?.message === 'USER_CANCELLED') {
+      setStatus('cancelled')
+      setTimeout(() => setStatus('idle'), 1000)
     }
+    if (error && error.message !== 'USER_CANCELLED') {
+      setStatus('failed')
+      setTimeout(() => setStatus('idle'), 1000)
+    }
+  }, [error])
 
-    setStatus('confirming')
-
-    const lastTokenId = mintedIds[mintedIds.length - 1]
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL!
-    const collectionName = process.env.NEXT_PUBLIC_NFT_NAME!
-    const nftImageUrl = `${appUrl}/api/nft/${lastTokenId}`
-
-    setStatus('success')
-    await refetch()
+  const handleMint = async () => {
+    if (!isConnected || !mintPrice || status !== 'idle') return
 
     try {
-      await sdk.actions.composeCast({
-        text: `Just minted my ${collectionName} 💜\n\u200B\nGet yours now 💀🔥`,
-        embeds: [nftImageUrl, appUrl],
-      })
-    } catch (castErr) {
-      console.log("Cast failed:", castErr)
-    }
+      const ids = await mintNFT(quantity, mintPrice)
+      if (!ids || ids.length === 0) return
 
-    setTimeout(() => setStatus('idle'), 0)
+      await refetch()
 
-  } catch (err: any) {
-    const message = err?.message?.toLowerCase() || ""
+      const lastTokenId = ids[ids.length - 1]
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL!
+      const collectionName = process.env.NEXT_PUBLIC_NFT_NAME!
+      const nftImageUrl = `${appUrl}/api/nft/${lastTokenId}`
 
-    if (err?.code === 4001 || message.includes("reject") || message.includes("cancel")) {
-      setStatus('cancelled')
-    } else {
-      setStatus('failed')
-    }
-
-    setTimeout(() => setStatus('idle'), 800)
+      if (status === 'success') {
+        await sdk.actions.composeCast({
+          text: `Just minted my ${collectionName} 💜\n\u200B\nGet yours now 💀🔥`,
+          embeds: [nftImageUrl, appUrl],
+        })
+        setTimeout(() => setStatus('idle'), 0)
+      }
+    } catch {}
   }
-}
 
   const getButtonText = () => {
     if (status === 'pending') return 'Processing'
@@ -104,22 +105,12 @@ export default function HomePage() {
 
   const disabled = status !== 'idle' || !isConnected || loading || isSoldOut || !mintingEnabled || remainingMints <= 0
 
-  const xUrl = process.env.NEXT_PUBLIC_X_URL
-  const farcasterUrl = process.env.NEXT_PUBLIC_FARCASTER_URL
-  const openseaUrl = process.env.NEXT_PUBLIC_OPENSEA_URL
-
   return (
     <div className="min-h-screen flex flex-col items-center pt-10 px-4" style={{ backgroundColor: '#101010' }}>
-      <div className="fixed top-6 right-4 flex gap-3 z-50">
-        {xUrl && <a href={xUrl} target="_blank"><img src="/x.png" className="w-7 h-7 object-contain" /></a>}
-        {farcasterUrl && <a href={farcasterUrl} target="_blank"><img src="/farcaster.png" className="w-7 h-7 object-contain" /></a>}
-        {openseaUrl && <a href={openseaUrl} target="_blank"><img src="/opensea.png" className="w-7 h-7 object-contain" /></a>}
-      </div>
-
       <div className="relative w-full max-w-md mx-auto mb-4 mt-16">
         <NFTPreview className="w-full aspect-square rounded-2xl" />
         {!loading && mintPrice && (
-          <div className="absolute top-2 left-2 bg-black bg-opacity-70 px-3 py-1 rounded-full text-white text-sm font-bold shadow-lg">
+          <div className="absolute top-2 left-2 bg-black bg-opacity-70 px-3 py-1 rounded-full text-white text-sm font-bold">
             {formatEth(Number(mintPrice))} ETH
           </div>
         )}
@@ -134,18 +125,18 @@ export default function HomePage() {
       </div>
 
       <div className="flex items-center justify-center gap-3 mb-4">
-        <Button onClick={() => setQuantity(q => Math.max(1, q - 1))} disabled={status !== 'idle' || quantity <= 1} className="text-white w-10 h-10 rounded-full shadow-lg disabled:opacity-50" style={{ backgroundColor: '#6A3CFF', border: '1px solid #5631CF' }}>
+        <Button onClick={() => setQuantity(q => Math.max(1, q - 1))} disabled={status !== 'idle' || quantity <= 1} className="text-white w-10 h-10 rounded-full">
           <Minus className="w-4 h-4" />
         </Button>
-        <div className="w-16 h-10 bg-white bg-opacity-20 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg">
+        <div className="w-16 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
           <span className="text-2xl font-bold text-white">{quantity}</span>
         </div>
-        <Button onClick={() => setQuantity(q => Math.min(maxQuantity, q + 1))} disabled={status !== 'idle' || quantity >= maxQuantity} className="text-white w-10 h-10 rounded-full shadow-lg disabled:opacity-50" style={{ backgroundColor: '#6A3CFF', border: '1px solid #5631CF' }}>
+        <Button onClick={() => setQuantity(q => Math.min(maxQuantity, q + 1))} disabled={status !== 'idle' || quantity >= maxQuantity} className="text-white w-10 h-10 rounded-full">
           <Plus className="w-4 h-4" />
         </Button>
       </div>
 
-      <Button onClick={handleMint} disabled={disabled} className="w-full max-w-md text-white h-15 text-xl font-semibold rounded-full shadow-xl disabled:opacity-50" style={{ backgroundColor: '#6A3CFF', border: '1px solid #5631CF' }}>
+      <Button onClick={handleMint} disabled={disabled} className="w-full max-w-md text-white h-15 text-xl font-semibold rounded-full disabled:opacity-50">
         {getButtonText()}
       </Button>
     </div>
