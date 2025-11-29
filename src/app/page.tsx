@@ -15,7 +15,7 @@ export default function Page() {
 
   useEffect(() => {
     sdk
-      .isInMiniApp({ timeoutMs: 10 })
+      .isInMiniApp()
       .then((inApp) => setIsInFarcaster(inApp))
       .catch(() => setIsInFarcaster(false))
   }, [])
