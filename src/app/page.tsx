@@ -11,7 +11,7 @@ import { NFTImageSlider } from '@/components/NFTImageSlider'
 import { sdk } from '@farcaster/miniapp-sdk'
 import { notFound } from 'next/navigation'
 
-export default function MintPage() {
+export default function HomePage() {
   const [quantity, setQuantity] = useState(1)
   const [status, setStatus] = useState<'idle' | 'pending' | 'confirming' | 'success' | 'failed' | 'cancelled'>('idle')
   const [isInFarcaster, setIsInFarcaster] = useState<boolean | null>(null)
@@ -38,24 +38,30 @@ export default function MintPage() {
   const formatEth = (v: number) => parseFloat(v.toFixed(7)).toString()
   const reset = () => setTimeout(() => setStatus('idle'), 1000)
 
+  // --- Farcaster SDK check ---
   useEffect(() => {
-    sdk.isInMiniApp()
-      .then(inApp => setIsInFarcaster(inApp))
-      .catch(() => setIsInFarcaster(false))
+    const initFarcaster = async () => {
+      try {
+        await sdk.actions.ready()
+        const inApp = await sdk.isInMiniApp()
+        setIsInFarcaster(inApp)
+      } catch (err) {
+        console.error('Farcaster SDK init failed', err)
+        setIsInFarcaster(false)
+      }
+    }
+    initFarcaster()
   }, [])
 
-  if (isInFarcaster === false) {
-    notFound()
-  }
-
   if (isInFarcaster === null) return null
+  if (isInFarcaster === false) notFound() // Block non-mini-app users
 
+  // --- Mint handler ---
   const handleMint = async () => {
     if (!isConnected || !mintPrice) return
 
     try {
       setStatus('pending')
-
       const mintedIds = await mintNFT(quantity, mintPrice)
 
       if (!mintedIds || mintedIds.length === 0) {
@@ -79,7 +85,6 @@ export default function MintPage() {
       setStatus('success')
       await refetch()
       reset()
-
     } catch (err: any) {
       console.error(err)
       if (err?.code === 4001) {
@@ -117,6 +122,7 @@ export default function MintPage() {
   const farcasterUrl = process.env.NEXT_PUBLIC_FARCASTER_URL
   const openseaUrl = process.env.NEXT_PUBLIC_OPENSEA_URL
 
+  // --- JSX ---
   return (
     <div
       className="min-h-screen flex flex-col items-center pt-10 px-4"
@@ -150,10 +156,7 @@ export default function MintPage() {
           onClick={() => quantity > 1 && setQuantity(quantity - 1)}
           disabled={quantity <= 1}
           className="text-white w-10 h-10 rounded-full shadow-lg disabled:opacity-50"
-          style={{
-            backgroundColor: '#6A3CFF',
-            border: '1px solid #5631CF'
-          }}
+          style={{ backgroundColor: '#6A3CFF', border: '1px solid #5631CF' }}
         >
           <Minus className="w-4 h-4" />
         </Button>
@@ -166,10 +169,7 @@ export default function MintPage() {
           onClick={() => quantity < maxQuantity && setQuantity(quantity + 1)}
           disabled={quantity >= maxQuantity}
           className="text-white w-10 h-10 rounded-full shadow-lg disabled:opacity-50"
-          style={{
-            backgroundColor: '#6A3CFF',
-            border: '1px solid #5631CF'
-          }}
+          style={{ backgroundColor: '#6A3CFF', border: '1px solid #5631CF' }}
         >
           <Plus className="w-4 h-4" />
         </Button>
@@ -179,10 +179,7 @@ export default function MintPage() {
         onClick={handleMint}
         disabled={disabled}
         className="w-full max-w-md text-white h-15 text-xl font-semibold rounded-full shadow-xl disabled:opacity-50"
-        style={{
-          backgroundColor: '#6A3CFF',
-          border: '1px solid #5631CF'
-        }}
+        style={{ backgroundColor: '#6A3CFF', border: '1px solid #5631CF' }}
       >
         {getButtonText()}
       </Button>
