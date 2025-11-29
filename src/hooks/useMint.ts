@@ -7,19 +7,9 @@ import { CONTRACT_CONFIG } from '@/config/contract'
 import { readContract } from '@wagmi/core'
 import { wagmiConfig } from '@/config/wagmi'
 
-interface MintResult {
-  mintNFT: (quantity: number, mintPrice: string) => Promise<number[] | undefined>
-  isPending: boolean
-  isConfirming: boolean
-  isSuccess: boolean
-  error: Error | null
-  transactionHash: string | undefined
-  mintedIds: number[]
-}
-
-export function useMint(): MintResult {
+export function useMint() {
   const { address } = useAccount()
-  const [transactionHash, setTransactionHash] = useState<string | undefined>()
+  const [transactionHash, setTransactionHash] = useState<string>()
   const [error, setError] = useState<Error | null>(null)
   const [mintedIds, setMintedIds] = useState<number[]>([])
 
@@ -29,16 +19,13 @@ export function useMint(): MintResult {
     hash: transactionHash as `0x${string}` | undefined,
   })
 
-  const mintNFT = async (quantity: number, mintPrice: string): Promise<number[] | undefined> => {
-    if (!address) {
-      setError(new Error('Wallet not connected'))
-      return undefined
-    }
+  const mintNFT = async (quantity: number, mintPrice: string) => {
+    if (!address) return undefined
 
     try {
       setError(null)
 
-      const totalSupplyBefore = Number(
+      const before = Number(
         await readContract(wagmiConfig, {
           address: CONTRACT_CONFIG.address,
           abi: CONTRACT_CONFIG.abi,
@@ -64,16 +51,12 @@ export function useMint(): MintResult {
         if (
           err?.code === 4001 ||
           msg.includes("user rejected") ||
-          msg.includes("denied") ||
-          msg.includes("cancel") ||
-          msg.includes("rejected the request") ||
-          msg.includes("request failed after user") ||
-          msg.includes("user cancelled") ||
-          msg.includes("frame: user cancelled")
+          msg.includes("cancel")
         ) {
-          const cancelErr = new Error("USER_CANCELLED")
-          ;(cancelErr as any).code = 4001
-          throw cancelErr
+          const e = new Error("USER_CANCELLED") as any
+          e.code = 4001
+          setError(e)
+          return undefined
         }
 
         throw err
@@ -81,39 +64,33 @@ export function useMint(): MintResult {
 
       setTransactionHash(txHash)
 
-      const receiptTotalSupply = await new Promise<number>((resolve) => {
-        const interval = setInterval(async () => {
-          const now = Number(
-            await readContract(wagmiConfig, {
-              address: CONTRACT_CONFIG.address,
-              abi: CONTRACT_CONFIG.abi,
-              functionName: 'totalSupply',
-            })
-          )
-          if (now >= totalSupplyBefore + quantity) {
-            clearInterval(interval)
-            resolve(now)
+      await new Promise<void>((resolve) => {
+        const check = setInterval(() => {
+          if (!isConfirming) {
+            clearInterval(check)
+            resolve()
           }
-        }, 1000)
+        }, 300)
       })
 
-      const arr: number[] = []
-      for (let i = totalSupplyBefore + 1; i <= receiptTotalSupply; i++) {
-        arr.push(i)
-      }
+      if (!isSuccess) return undefined
 
-      setMintedIds(arr)
-      return arr
+      const after = Number(
+        await readContract(wagmiConfig, {
+          address: CONTRACT_CONFIG.address,
+          abi: CONTRACT_CONFIG.abi,
+          functionName: 'totalSupply',
+        })
+      )
+
+      const ids: number[] = []
+      for (let id = before + 1; id <= after; id++) ids.push(id)
+
+      setMintedIds(ids)
+      return ids
+
     } catch (err: any) {
-      if (err?.code === 4001) {
-        const cancelError = new Error("USER_CANCELLED")
-        ;(cancelError as any).code = 4001
-        setError(cancelError)
-        return undefined
-      }
-
       setError(err)
-      console.error('Mint error:', err)
       return undefined
     }
   }
