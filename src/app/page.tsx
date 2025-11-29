@@ -13,13 +13,24 @@ import { notFound } from "next/navigation"
 
 export default function Home() {
   const [quantity, setQuantity] = useState(1)
-  const [status, setStatus] = useState<"idle" | "pending" | "confirming" | "success" | "failed" | "cancelled">("idle")
+  const [status, setStatus] = useState<
+    "idle" | "pending" | "confirming" | "success" | "failed" | "cancelled"
+  >("idle")
+
   const [isInFarcaster, setIsInFarcaster] = useState<boolean | null>(null)
 
   const { address, isConnected } = useAccount()
 
-  const { totalSupply, maxSupply, userBalance, maxMintPerAddress, mintingEnabled, loading, mintPrice, refetch } =
-    useContractData(address)
+  const {
+    totalSupply,
+    maxSupply,
+    userBalance,
+    maxMintPerAddress,
+    mintingEnabled,
+    loading,
+    mintPrice,
+    refetch,
+  } = useContractData(address)
 
   const { mintNFT } = useMint()
 
@@ -30,25 +41,41 @@ export default function Home() {
   const formatEth = (v: number) => Number.parseFloat(v.toFixed(7)).toString()
   const reset = () => setTimeout(() => setStatus("idle"), 1000)
 
+  // -------------------------------------------------------
+  //   FIXED: FARCASTER MINI-APP DETECTION (NO MORE SPLASH)
+  // -------------------------------------------------------
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      if (isInFarcaster === null) {
+    let active = true
+
+    const fallback = setTimeout(() => {
+      if (active && isInFarcaster === null) {
         setIsInFarcaster(false)
       }
-    }, 2000)
+    }, 1500)
 
     sdk
       .isInMiniApp()
-      .then((inApp) => setIsInFarcaster(inApp))
-      .catch(() => setIsInFarcaster(false))
-      .finally(() => clearTimeout(timeout))
+      .then((inApp) => {
+        if (active) setIsInFarcaster(inApp)
+      })
+      .catch(() => {
+        if (active) setIsInFarcaster(false)
+      })
+
+    return () => {
+      active = false
+    }
   }, [])
 
+  // if NOT in farcaster → show 404
   if (isInFarcaster === false) {
     notFound()
   }
 
+  // still loading → show splash
   if (isInFarcaster === null) return null
+
+  // -------------------------------------------------------
 
   const handleMint = async () => {
     if (!isConnected || !mintPrice) return
@@ -158,10 +185,7 @@ export default function Home() {
           onClick={() => quantity > 1 && setQuantity(quantity - 1)}
           disabled={quantity <= 1}
           className="text-white w-10 h-10 rounded-full shadow-lg disabled:opacity-50"
-          style={{
-            backgroundColor: "#6A3CFF",
-            border: "1px solid #5631CF",
-          }}
+          style={{ backgroundColor: "#6A3CFF", border: "1px solid #5631CF" }}
         >
           <Minus className="w-4 h-4" />
         </Button>
@@ -174,10 +198,7 @@ export default function Home() {
           onClick={() => quantity < maxQuantity && setQuantity(quantity + 1)}
           disabled={quantity >= maxQuantity}
           className="text-white w-10 h-10 rounded-full shadow-lg disabled:opacity-50"
-          style={{
-            backgroundColor: "#6A3CFF",
-            border: "1px solid #5631CF",
-          }}
+          style={{ backgroundColor: "#6A3CFF", border: "1px solid #5631CF" }}
         >
           <Plus className="w-4 h-4" />
         </Button>
@@ -187,10 +208,7 @@ export default function Home() {
         onClick={handleMint}
         disabled={disabled}
         className="w-full max-w-md text-white h-15 text-xl font-semibold rounded-full shadow-xl disabled:opacity-50"
-        style={{
-          backgroundColor: "#6A3CFF",
-          border: "1px solid #5631CF",
-        }}
+        style={{ backgroundColor: "#6A3CFF", border: "1px solid #5631CF" }}
       >
         {getButtonText()}
       </Button>
