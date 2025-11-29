@@ -55,7 +55,7 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Providers>
-          <FarcasterWrapper>{children}</FarcasterWrapper>
+          {children}
         </Providers>
       </body>
     </html>
