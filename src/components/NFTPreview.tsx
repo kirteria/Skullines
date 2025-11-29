@@ -12,7 +12,7 @@ export function NFTPreview({ className = '' }: NFTPreviewProps) {
       className={`aspect-square bg-[#101010] rounded-2xl overflow-hidden relative ${className}`}
     >
       <Image
-        src="/skull.png"
+        src="/preview.gif"
         alt="nft"
         fill
         sizes="280px"
