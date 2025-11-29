@@ -48,13 +48,37 @@ export function useMint(): MintResult {
 
       const totalValue = parseEther((Number(mintPrice) * quantity).toString())
 
-      const txHash: string = await writeContractAsync({
-        address: CONTRACT_CONFIG.address,
-        abi: CONTRACT_CONFIG.abi,
-        functionName: 'mint',
-        args: [BigInt(quantity)],
-        value: totalValue,
-      })
+      let txHash: string
+
+      try {
+        txHash = await writeContractAsync({
+          address: CONTRACT_CONFIG.address,
+          abi: CONTRACT_CONFIG.abi,
+          functionName: 'mint',
+          args: [BigInt(quantity)],
+          value: totalValue,
+        })
+      } catch (err: any) {
+        const msg = err?.message?.toLowerCase() || ""
+
+        if (
+          err?.code === 4001 ||
+          msg.includes("user rejected") ||
+          msg.includes("denied") ||
+          msg.includes("cancel") ||
+          msg.includes("rejected the request") ||
+          msg.includes("request failed after user") ||
+          msg.includes("user cancelled") ||
+          msg.includes("frame: user cancelled")
+        ) {
+          const cancelErr = new Error("USER_CANCELLED")
+          ;(cancelErr as any).code = 4001
+          throw cancelErr
+        }
+
+        throw err
+      }
+
       setTransactionHash(txHash)
 
       const receiptTotalSupply = await new Promise<number>((resolve) => {
@@ -80,10 +104,16 @@ export function useMint(): MintResult {
 
       setMintedIds(arr)
       return arr
-    } catch (err) {
-      const e = err as Error
-      setError(e)
-      console.error('Mint error:', e)
+    } catch (err: any) {
+      if (err?.code === 4001) {
+        const cancelError = new Error("USER_CANCELLED")
+        ;(cancelError as any).code = 4001
+        setError(cancelError)
+        return undefined
+      }
+
+      setError(err)
+      console.error('Mint error:', err)
       return undefined
     }
   }
