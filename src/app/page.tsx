@@ -38,7 +38,6 @@ export default function HomePage() {
   const formatEth = (v: number) => parseFloat(v.toFixed(7)).toString()
   const reset = () => setTimeout(() => setStatus('idle'), 1000)
 
-  // --- Farcaster SDK check ---
   useEffect(() => {
     const initFarcaster = async () => {
       try {
@@ -54,9 +53,8 @@ export default function HomePage() {
   }, [])
 
   if (isInFarcaster === null) return null
-  if (isInFarcaster === false) notFound() // Block non-mini-app users
+  if (isInFarcaster === false) notFound()
 
-  // --- Mint handler ---
   const handleMint = async () => {
     if (!isConnected || !mintPrice) return
 
@@ -122,7 +120,6 @@ export default function HomePage() {
   const farcasterUrl = process.env.NEXT_PUBLIC_FARCASTER_URL
   const openseaUrl = process.env.NEXT_PUBLIC_OPENSEA_URL
 
-  // --- JSX ---
   return (
     <div
       className="min-h-screen flex flex-col items-center pt-10 px-4"
