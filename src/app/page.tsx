@@ -18,7 +18,7 @@ export default function HomePage() {
 
   const { address, isConnected } = useAccount()
   const { totalSupply, maxSupply, userBalance, maxMintPerAddress, mintingEnabled, loading, mintPrice, refetch } = useContractData(address)
-  const { mintNFT, isPending, error, mintedIds } = useMint()
+  const { mintNFT } = useMint()
 
   const remainingMints = Math.max((maxMintPerAddress || 0) - (userBalance || 0), 0)
   const maxQuantity = remainingMints
@@ -49,8 +49,8 @@ export default function HomePage() {
 
     let minted
     try {
-      minted = await mintNFT(quantity, mintPrice)
       setStatus('confirming')
+      minted = await mintNFT(quantity, mintPrice)
     } catch (err: any) {
       if (err?.message === 'USER_CANCELLED' || err?.code === 4001) setStatus('cancelled')
       else setStatus('failed')
