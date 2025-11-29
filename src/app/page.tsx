@@ -46,11 +46,8 @@ export default function HomePage() {
     if (!isConnected || !mintPrice || status !== 'idle') return
 
     setStatus('pending')
-    await new Promise(resolve => setTimeout(resolve, 200))
-
-    let minted: number[] | undefined
+    let minted
     try {
-      setStatus('confirming')
       minted = await mintNFT(quantity, mintPrice)
     } catch (err: any) {
       if (err?.message === 'USER_CANCELLED' || err?.code === 4001) setStatus('cancelled')
@@ -65,20 +62,20 @@ export default function HomePage() {
       return
     }
 
+    setStatus('confirming')
     const lastTokenId = minted[minted.length - 1]
     const appUrl = process.env.NEXT_PUBLIC_APP_URL!
     const collectionName = process.env.NEXT_PUBLIC_NFT_NAME!
     const nftImageUrl = `${appUrl}/api/nft/${lastTokenId}`
 
-    setStatus('success')
     await refetch()
-
     await sdk.actions.composeCast({
       text: `Just minted my ${collectionName} 💜\n\u200B\nGet yours now 💀🔥`,
       embeds: [nftImageUrl, appUrl],
     })
 
-    setTimeout(() => setStatus('idle'), 1000)
+    setStatus('success')
+    setTimeout(() => setStatus('idle'), 2000)
   }
 
   const getButtonText = () => {
@@ -94,7 +91,13 @@ export default function HomePage() {
     return 'Mint'
   }
 
-  const disabled = status !== 'idle' || !isConnected || loading || isSoldOut || !mintingEnabled || remainingMints <= 0
+  const disabled =
+    status !== 'idle' ||
+    !isConnected ||
+    loading ||
+    isSoldOut ||
+    !mintingEnabled ||
+    remainingMints <= 0
 
   const xUrl = process.env.NEXT_PUBLIC_X_URL
   const farcasterUrl = process.env.NEXT_PUBLIC_FARCASTER_URL
