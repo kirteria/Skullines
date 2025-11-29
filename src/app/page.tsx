@@ -11,13 +11,23 @@ import { NFTPreview } from '@/components/NFTPreview'
 import { sdk } from '@farcaster/miniapp-sdk'
 import { Blocked } from '@/components/Blocked'
 
+type MintStatus =
+  | "idle"
+  | "processing"
+  | "verifying"
+  | "success"
+  | "failed"
+  | "cancelled"
+
 export default function HomePage() {
   const [quantity, setQuantity] = useState(1)
-  const [status, setStatus] = useState<"idle" | "processing" | "verifying" | "success" | "failed" | "cancelled">("idle")
+  const [status, setStatus] = useState<MintStatus>("idle")
   const [isInFarcaster, setIsInFarcaster] = useState<boolean | null>(null)
 
   const { address, isConnected } = useAccount()
-  const { totalSupply, maxSupply, userBalance, maxMintPerAddress, mintingEnabled, loading, mintPrice, refetch } = useContractData(address)
+  const { totalSupply, maxSupply, userBalance, maxMintPerAddress, mintingEnabled, loading, mintPrice, refetch } =
+    useContractData(address)
+
   const { mintNFT, isPending, isConfirming, isSuccess, error, mintedIds } = useMint()
 
   const remainingMints = Math.max((maxMintPerAddress || 0) - (userBalance || 0), 0)
@@ -42,31 +52,37 @@ export default function HomePage() {
   if (isInFarcaster === null) return null
   if (isInFarcaster === false) return <Blocked />
 
+  // pending → processing
   useEffect(() => {
-    if (isPending && status === 'idle') setStatus('processing')
+    if (isPending && status === "idle") setStatus("processing")
   }, [isPending])
 
+  // confirming → verifying
   useEffect(() => {
-    if (status === 'processing' && isConfirming) setStatus('verifying')
+    if (status === "processing" && isConfirming) setStatus("verifying")
   }, [isConfirming])
 
+  // success → success
   useEffect(() => {
-    if (status === 'verifying' && isSuccess) setStatus('success')
+    if (status === "verifying" && isSuccess) setStatus("success")
   }, [isSuccess])
 
+  // errors
   useEffect(() => {
-    if (error?.message === 'USER_CANCELLED') {
-      setStatus('cancelled')
-      setTimeout(() => setStatus('idle'), 1000)
+    if (!error) return
+
+    if (error.message === "USER_CANCELLED") {
+      setStatus("cancelled")
+      setTimeout(() => setStatus("idle"), 1000)
+      return
     }
-    if (error && error.message !== 'USER_CANCELLED') {
-      setStatus('failed')
-      setTimeout(() => setStatus('idle'), 1000)
-    }
+
+    setStatus("failed")
+    setTimeout(() => setStatus("idle"), 1000)
   }, [error])
 
   const handleMint = async () => {
-    if (!isConnected || !mintPrice || status !== 'idle') return
+    if (!isConnected || !mintPrice || status !== "idle") return
 
     const ids = await mintNFT(quantity, mintPrice)
     if (!ids || ids.length === 0) return
@@ -78,28 +94,36 @@ export default function HomePage() {
     const collectionName = process.env.NEXT_PUBLIC_NFT_NAME!
     const nftImageUrl = `${appUrl}/api/nft/${lastTokenId}`
 
-    await sdk.actions.composeCast({
-      text: `Just minted my ${collectionName} 💜\n\u200B\nGet yours now 💀🔥`,
-      embeds: [nftImageUrl, appUrl]
-    })
+    if (isSuccess) {
+      await sdk.actions.composeCast({
+        text: `Just minted my ${collectionName} 💜\n\u200B\nGet yours now 💀🔥`,
+        embeds: [nftImageUrl, appUrl],
+      })
+    }
 
-    setStatus('idle')
+    setStatus("idle")
   }
 
   const getButtonText = () => {
-    if (status === 'processing') return 'Processing'
-    if (status === 'verifying') return 'Verifying'
-    if (status === 'success') return 'Mint Successfully'
-    if (status === 'failed') return 'Mint Failed'
-    if (status === 'cancelled') return 'Mint Canceled'
-    if (loading) return 'Loading'
-    if (isSoldOut) return 'Minted Out'
-    if (!mintingEnabled) return 'Mint Paused'
-    if (remainingMints <= 0) return 'Max Mint Reached'
-    return 'Mint'
+    if (status === "processing") return "Processing"
+    if (status === "verifying") return "Verifying"
+    if (status === "success") return "Mint Successfully"
+    if (status === "failed") return "Mint Failed"
+    if (status === "cancelled") return "Mint Canceled"
+    if (loading) return "Loading"
+    if (isSoldOut) return "Minted Out"
+    if (!mintingEnabled) return "Mint Paused"
+    if (remainingMints <= 0) return "Max Mint Reached"
+    return "Mint"
   }
 
-  const disabled = status !== 'idle' || !isConnected || loading || isSoldOut || !mintingEnabled || remainingMints <= 0
+  const disabled =
+    status !== "idle" ||
+    !isConnected ||
+    loading ||
+    isSoldOut ||
+    !mintingEnabled ||
+    remainingMints <= 0
 
   return (
     <div className="min-h-screen flex flex-col items-center pt-10 px-4" style={{ backgroundColor: '#101010' }}>
@@ -115,13 +139,19 @@ export default function HomePage() {
       <div className="w-full max-w-md mx-auto mb-3">
         <div className="flex justify-between text-sm mb-1">
           <span className="font-bold text-white">Minted</span>
-          <span className="font-semibold text-white">{loading ? '...' : `${totalSupply}/${maxSupply}`}</span>
+          <span className="font-semibold text-white">
+            {loading ? '...' : `${totalSupply}/${maxSupply}`}
+          </span>
         </div>
         <Progress value={progressPercentage} className="h-2 rounded-full" />
       </div>
 
       <div className="flex items-center justify-center gap-3 mb-4">
-        <Button onClick={() => setQuantity(q => Math.max(1, q - 1))} disabled={status !== 'idle' || quantity <= 1} className="text-white w-10 h-10 rounded-full">
+        <Button
+          onClick={() => setQuantity(q => Math.max(1, q - 1))}
+          disabled={status !== "idle" || quantity <= 1}
+          className="text-white w-10 h-10 rounded-full"
+        >
           <Minus className="w-4 h-4" />
         </Button>
 
@@ -129,12 +159,20 @@ export default function HomePage() {
           <span className="text-2xl font-bold text-white">{quantity}</span>
         </div>
 
-        <Button onClick={() => setQuantity(q => Math.min(maxQuantity, q + 1))} disabled={status !== 'idle' || quantity >= maxQuantity} className="text-white w-10 h-10 rounded-full">
+        <Button
+          onClick={() => setQuantity(q => Math.min(maxQuantity, q + 1))}
+          disabled={status !== "idle" || quantity >= maxQuantity}
+          className="text-white w-10 h-10 rounded-full"
+        >
           <Plus className="w-4 h-4" />
         </Button>
       </div>
 
-      <Button onClick={handleMint} disabled={disabled} className="w-full max-w-md text-white h-15 text-xl font-semibold rounded-full disabled:opacity-50">
+      <Button
+        onClick={handleMint}
+        disabled={disabled}
+        className="w-full max-w-md text-white h-15 text-xl font-semibold rounded-full disabled:opacity-50"
+      >
         {getButtonText()}
       </Button>
     </div>
