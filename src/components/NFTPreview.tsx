@@ -2,11 +2,11 @@
 
 import Image from 'next/image'
 
-interface NFTImageSliderProps {
+interface NFTPreviewProps {
   className?: string
 }
 
-export function NFTImageSlider({ className = '' }: NFTImageSliderProps) {
+export function NFTPreview({ className = '' }: NFTPreviewProps) {
   return (
     <div
       className={`aspect-square bg-[#101010] rounded-2xl overflow-hidden relative ${className}`}
