@@ -65,7 +65,7 @@ export default function HomePage() {
             })
           }
         } catch {}
-        setTimeout(() => setStatus('idle'), 1500)
+        setTimeout(() => setStatus('idle'), 0)
       },
       onFailed: () => { setStatus('failed'); setTimeout(() => setStatus('idle'), 1500) },
       onCancelled: () => { setStatus('cancelled'); setTimeout(() => setStatus('idle'), 1500) }
