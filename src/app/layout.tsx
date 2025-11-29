@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import { cookies } from "next/headers";
+import FarcasterWrapper from "@/components/FarcasterWrapper";
 import { Providers } from "@/providers";
 
 const geistSans = localFont({
@@ -54,7 +55,7 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Providers>
-          {children}
+          <FarcasterWrapper>{children}</FarcasterWrapper>
         </Providers>
       </body>
     </html>
