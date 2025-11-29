@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
+import { useAccount, useWriteContract } from 'wagmi'
 import { parseEther } from 'viem'
 import { CONTRACT_CONFIG } from '@/config/contract'
 import { readContract } from '@wagmi/core'
@@ -12,19 +12,12 @@ export function useMint() {
   const [transactionHash, setTransactionHash] = useState<string>()
   const [error, setError] = useState<Error | null>(null)
   const [mintedIds, setMintedIds] = useState<number[]>([])
-
   const { writeContractAsync, isPending } = useWriteContract()
-
-  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
-    hash: transactionHash as `0x${string}` | undefined,
-  })
 
   const mintNFT = async (quantity: number, mintPrice: string) => {
     if (!address) return undefined
-
     try {
       setError(null)
-
       const before = Number(
         await readContract(wagmiConfig, {
           address: CONTRACT_CONFIG.address,
@@ -32,11 +25,8 @@ export function useMint() {
           functionName: 'totalSupply',
         })
       )
-
       const totalValue = parseEther((Number(mintPrice) * quantity).toString())
-
       let txHash: string
-
       try {
         txHash = await writeContractAsync({
           address: CONTRACT_CONFIG.address,
@@ -47,7 +37,6 @@ export function useMint() {
         })
       } catch (err: any) {
         const msg = err?.message?.toLowerCase() || ""
-
         if (
           err?.code === 4001 ||
           msg.includes("user rejected") ||
@@ -58,37 +47,28 @@ export function useMint() {
           setError(e)
           return undefined
         }
-
         throw err
       }
-
       setTransactionHash(txHash)
-
-      await new Promise<void>((resolve) => {
-        const check = setInterval(() => {
-          if (!isConfirming) {
-            clearInterval(check)
-            resolve()
+      const receiptTotalSupply = await new Promise<number>((resolve) => {
+        const interval = setInterval(async () => {
+          const now = Number(
+            await readContract(wagmiConfig, {
+              address: CONTRACT_CONFIG.address,
+              abi: CONTRACT_CONFIG.abi,
+              functionName: 'totalSupply',
+            })
+          )
+          if (now >= before + quantity) {
+            clearInterval(interval)
+            resolve(now)
           }
-        }, 300)
+        }, 1000)
       })
-
-      if (!isSuccess) return undefined
-
-      const after = Number(
-        await readContract(wagmiConfig, {
-          address: CONTRACT_CONFIG.address,
-          abi: CONTRACT_CONFIG.abi,
-          functionName: 'totalSupply',
-        })
-      )
-
       const ids: number[] = []
-      for (let id = before + 1; id <= after; id++) ids.push(id)
-
+      for (let id = before + 1; id <= receiptTotalSupply; id++) ids.push(id)
       setMintedIds(ids)
       return ids
-
     } catch (err: any) {
       setError(err)
       return undefined
@@ -98,8 +78,6 @@ export function useMint() {
   return {
     mintNFT,
     isPending,
-    isConfirming,
-    isSuccess,
     error,
     transactionHash,
     mintedIds,
