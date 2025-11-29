@@ -46,7 +46,7 @@ export default function HomePage() {
     if (!isConnected || !mintPrice || status !== 'idle') return
 
     setStatus('pending')
-    await new Promise(resolve => setTimeout(resolve, 50))
+    await new Promise(resolve => setTimeout(resolve, 200))
 
     let minted: number[] | undefined
     try {
