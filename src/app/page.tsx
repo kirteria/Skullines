@@ -13,24 +13,12 @@ import { Blocked } from '@/components/Blocked'
 
 export default function HomePage() {
   const [quantity, setQuantity] = useState(1)
-  const [status, setStatus] = useState<
-    'idle' | 'pending' | 'confirming' | 'success' | 'failed' | 'cancelled'
-  >('idle')
+  const [status, setStatus] = useState<'idle' | 'pending' | 'confirming' | 'success' | 'failed' | 'cancelled'>('idle')
   const [isInFarcaster, setIsInFarcaster] = useState<boolean | null>(null)
 
   const { address, isConnected } = useAccount()
-  const {
-    totalSupply,
-    maxSupply,
-    userBalance,
-    maxMintPerAddress,
-    mintingEnabled,
-    loading,
-    mintPrice,
-    refetch,
-  } = useContractData(address)
-
-  const { mintNFT, mintedIds } = useMint()
+  const { totalSupply, maxSupply, userBalance, maxMintPerAddress, mintingEnabled, loading, mintPrice, refetch } = useContractData(address)
+  const { mintNFT } = useMint()
 
   const remainingMints = Math.max((maxMintPerAddress || 0) - (userBalance || 0), 0)
   const maxQuantity = remainingMints
@@ -38,7 +26,6 @@ export default function HomePage() {
   const progressPercentage = (totalSupply / maxSupply) * 100
   const formatEth = (v: number) => parseFloat(v.toFixed(7)).toString()
 
-  // Farcaster detection
   useEffect(() => {
     const initFarcaster = async () => {
       try {
@@ -58,11 +45,12 @@ export default function HomePage() {
   const handleMint = async () => {
     if (!isConnected || !mintPrice || status !== 'idle') return
 
-    setStatus('pending') // user clicked mint, wallet popup not confirmed yet
+    setStatus('pending')
+    await new Promise(resolve => setTimeout(resolve, 50))
 
     let minted: number[] | undefined
     try {
-      setStatus('confirming') // wallet confirmed, waiting for tx
+      setStatus('confirming')
       minted = await mintNFT(quantity, mintPrice)
     } catch (err: any) {
       if (err?.message === 'USER_CANCELLED' || err?.code === 4001) setStatus('cancelled')
@@ -90,7 +78,7 @@ export default function HomePage() {
       embeds: [nftImageUrl, appUrl],
     })
 
-    setTimeout(() => setStatus('idle'), 0)
+    setTimeout(() => setStatus('idle'), 1000)
   }
 
   const getButtonText = () => {
@@ -106,43 +94,20 @@ export default function HomePage() {
     return 'Mint'
   }
 
-  const disabled =
-    status !== 'idle' ||
-    !isConnected ||
-    loading ||
-    isSoldOut ||
-    !mintingEnabled ||
-    remainingMints <= 0
+  const disabled = status !== 'idle' || !isConnected || loading || isSoldOut || !mintingEnabled || remainingMints <= 0
 
   const xUrl = process.env.NEXT_PUBLIC_X_URL
   const farcasterUrl = process.env.NEXT_PUBLIC_FARCASTER_URL
   const openseaUrl = process.env.NEXT_PUBLIC_OPENSEA_URL
 
   return (
-    <div
-      className="min-h-screen flex flex-col items-center pt-10 px-4"
-      style={{ backgroundColor: '#101010' }}
-    >
-      {/* Social Links */}
+    <div className="min-h-screen flex flex-col items-center pt-10 px-4" style={{ backgroundColor: '#101010' }}>
       <div className="fixed top-6 right-4 flex gap-3 z-50">
-        {xUrl && (
-          <a href={xUrl} target="_blank" rel="noreferrer">
-            <img src="/x.png" className="w-7 h-7" />
-          </a>
-        )}
-        {farcasterUrl && (
-          <a href={farcasterUrl} target="_blank" rel="noreferrer">
-            <img src="/farcaster.png" className="w-7 h-7" />
-          </a>
-        )}
-        {openseaUrl && (
-          <a href={openseaUrl} target="_blank" rel="noreferrer">
-            <img src="/opensea.png" className="w-7 h-7" />
-          </a>
-        )}
+        {xUrl && <a href={xUrl} target="_blank"><img src="/x.png" className="w-7 h-7" /></a>}
+        {farcasterUrl && <a href={farcasterUrl} target="_blank"><img src="/farcaster.png" className="w-7 h-7" /></a>}
+        {openseaUrl && <a href={openseaUrl} target="_blank"><img src="/opensea.png" className="w-7 h-7" /></a>}
       </div>
 
-      {/* NFT Preview */}
       <div className="relative w-full max-w-md mx-auto mb-4 mt-16">
         <NFTPreview className="w-full aspect-square rounded-2xl" />
         {!loading && mintPrice && (
@@ -152,7 +117,6 @@ export default function HomePage() {
         )}
       </div>
 
-      {/* Progress */}
       <div className="w-full max-w-md mx-auto mb-3">
         <div className="flex justify-between text-sm mb-1">
           <span className="font-bold text-white">Minted</span>
@@ -163,10 +127,9 @@ export default function HomePage() {
         <Progress value={progressPercentage} className="h-2 rounded-full" />
       </div>
 
-      {/* Quantity Selector */}
       <div className="flex items-center justify-center gap-3 mb-4">
         <Button
-          onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+          onClick={() => setQuantity(q => Math.max(1, q - 1))}
           disabled={status !== 'idle' || quantity <= 1}
           className="text-white w-10 h-10 rounded-full shadow-lg disabled:opacity-50"
           style={{ backgroundColor: '#6A3CFF', border: '1px solid #5631CF' }}
@@ -179,7 +142,7 @@ export default function HomePage() {
         </div>
 
         <Button
-          onClick={() => setQuantity((q) => Math.min(maxQuantity, q + 1))}
+          onClick={() => setQuantity(q => Math.min(maxQuantity, q + 1))}
           disabled={status !== 'idle' || quantity >= maxQuantity}
           className="text-white w-10 h-10 rounded-full shadow-lg disabled:opacity-50"
           style={{ backgroundColor: '#6A3CFF', border: '1px solid #5631CF' }}
@@ -188,7 +151,6 @@ export default function HomePage() {
         </Button>
       </div>
 
-      {/* Mint Button */}
       <Button
         onClick={handleMint}
         disabled={disabled}
