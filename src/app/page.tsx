@@ -91,6 +91,7 @@ export default function HomePage() {
     if(status==='success') return 'Mint Successfully'  
     if(status==='failed') return 'Mint Failed'  
     if(status==='cancelled') return 'Mint Canceled'  
+    if(loading) return 'Mint'
     if(isSoldOut) return 'Minted Out'  
     if(!mintingEnabled) return 'Mint Paused'  
     if(remainingMints<=0) return 'Max Mint Reached'  
