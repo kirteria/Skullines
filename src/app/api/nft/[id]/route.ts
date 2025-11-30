@@ -6,7 +6,7 @@ export async function GET(
 ) {
   const { id } = await params
   const cid = process.env.NEXT_PUBLIC_NFT_CID!
-  const url = `https://dweb.link/ipfs/${cid}/${id}.png`
+  const url = `https://gateway.lighthouse.storage/ipfs/${cid}/${id}.png`
 
   const res = await fetch(url)
 
