@@ -20,6 +20,25 @@ const geistMono = localFont({
 export const metadata: Metadata = {
   title: "Skullines",
   description: "Pixel line Skull",
+
+  openGraph: {
+    title: "Skullines",
+    description: "Pixel line Skull",
+    images: ["https://skullines.xyz/og.png"],
+  },
+
+  twitter: {
+    card: "summary_large_image",
+    title: "Skullines",
+    description: "Pixel line Skull",
+    images: ["https://skullines.xyz/og.png"],
+  },
+
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
+  },
+
   other: {
     "fc:frame": JSON.stringify({
       version: "next",
