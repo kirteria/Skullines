@@ -23,8 +23,7 @@
     "tagline": "Born on Base",
     "ogTitle": "Skullines",
     "ogDescription": "Pixel line Skull",
-    "ogImageUrl": "https://skullines.xyz/og.png",
-    "noindex": true
+    "ogImageUrl": "https://skullines.xyz/og.png"
   },
   "baseBuilder": {
     "allowedAddresses": [
